@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://www.piwheels.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+absl-py = "*"
+attrs = "*"
+pygame = {extras = ["emu"],version = "*"}
+requests = "*"
+"luma.oled" = "*"
+"luma.emulator" = {extras = ["emu"],version = "*"}
+
+[requires]
+python_version = "3.7"

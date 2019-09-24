@@ -1,0 +1,157 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "23e550fba8bfdc599243d5bf2257f3cc32925c2f4f5357bf6c95ba488295d404"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.7"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://www.piwheels.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "absl-py": {
+            "hashes": [
+                "sha256:4f34a993e863b1b0c4aad745c991fc8448cf35d0efd2f80abad78c6ee93e9c75"
+            ],
+            "index": "pypi",
+            "version": "==0.8.0"
+        },
+        "attrs": {
+            "hashes": [
+                "sha256:69c0dbf2ed392de1cb5ec704444b08a5ef81680a61cb899dc08127123af36a79"
+            ],
+            "index": "pypi",
+            "version": "==19.1.0"
+        },
+        "certifi": {
+            "hashes": [
+                "sha256:fd7c7c74727ddcf00e9acd26bba8da604ffec95bf1c2144e67aff7a8b50e6cef"
+            ],
+            "version": "==2019.9.11"
+        },
+        "chardet": {
+            "hashes": [
+                "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"
+            ],
+            "version": "==3.0.4"
+        },
+        "idna": {
+            "hashes": [
+                "sha256:ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"
+            ],
+            "version": "==2.8"
+        },
+        "luma.core": {
+            "hashes": [
+                "sha256:0cf4726463485f55192ec02637eac1e943e296a83388066836cad9c02f7f3fae"
+            ],
+            "version": "==1.12.0"
+        },
+        "luma.emulator": {
+            "extras": [
+                "emu"
+            ],
+            "hashes": [
+                "sha256:5fcebd0ae04a3623b6fc81be61b6279c10ad6122992d9637785477864b03dad2"
+            ],
+            "index": "pypi",
+            "version": "==1.2.0"
+        },
+        "luma.oled": {
+            "hashes": [
+                "sha256:a09035082c910740d150197226fb138aa6fb94b5c812a64cac2b8425a35c8aec"
+            ],
+            "index": "pypi",
+            "version": "==3.3.0"
+        },
+        "pillow": {
+            "hashes": [
+                "sha256:782e20982b724df5a968928e1d3c06e6af95c07aa041e4e7c2e7cadfb19c0139",
+                "sha256:f74480fd0901a014e85863f899a67becf757bdf31b67271ad911667497f142ab"
+            ],
+            "version": "==6.1.0"
+        },
+        "pyftdi": {
+            "hashes": [
+                "sha256:8f99a47d67089079c50f1f9c2f7778423a4c3708af15261e637ca0b1dee8ad15"
+            ],
+            "markers": "python_version >= '3.5'",
+            "version": "==0.30.3"
+        },
+        "pygame": {
+            "extras": [
+                "emu"
+            ],
+            "hashes": [
+                "sha256:173e72b7de36c5350af15da50fb391e03f7966bfaf804ae591481bfbb7045399",
+                "sha256:7fa0f03759ec1ca8d2b05eaffb2a32241ea06091d087b45327946aa354d44d10",
+                "sha256:8723b3984c1b87cc95f1552d8002898ae1bca4f3bcb18512ef7185885d30d8ba"
+            ],
+            "index": "pypi",
+            "version": "==1.9.6"
+        },
+        "pyserial": {
+            "hashes": [
+                "sha256:e0770fadba80c31013896c7e6ef703f72e7834965954a78e71a3049488d4d7d8"
+            ],
+            "version": "==3.4"
+        },
+        "pyusb": {
+            "hashes": [
+                "sha256:789749b8a9bf3828c55d41df2c3e569739cd1bdbe1517e8d940af9587a711faa"
+            ],
+            "version": "==1.0.2"
+        },
+        "requests": {
+            "hashes": [
+                "sha256:9cf5292fcd0f598c671cfc1e0d7d1a7f13bb8085e9a590f48c010551dc6c4b31"
+            ],
+            "index": "pypi",
+            "version": "==2.22.0"
+        },
+        "rpi.gpio": {
+            "hashes": [
+                "sha256:5cd2f3c88d0b1e2f4780c905702c0474768c2bc113fb793121c2e117b401ab16",
+                "sha256:6a4791f41cafc2ee6e4cb70e5bd31fadc66a0cfab29b38df8723a98f6f73ad5a",
+                "sha256:7da5235aeba20da39ad4fb97f3ba3a2c6b2d60bba8958b00a4df42f608c6d42e"
+            ],
+            "markers": "platform_system == 'Linux'",
+            "version": "==0.7.0"
+        },
+        "six": {
+            "hashes": [
+                "sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c"
+            ],
+            "version": "==1.12.0"
+        },
+        "smbus2": {
+            "hashes": [
+                "sha256:0d080b3cefa06c6e33892725f3ea512b2b4741156b5bafe5bc6fae9461abde28"
+            ],
+            "version": "==0.3.0"
+        },
+        "spidev": {
+            "hashes": [
+                "sha256:8c559661f75a60b70e2143eb1fe8561ddfda4cc1a2b44eee75b547e75c149ac8",
+                "sha256:cacc06b27fd98ff5c73bad282de147f1ad20449fb0b7be1dfbb0c71a55b04b6b",
+                "sha256:f7e180dc8f45b56388ff9659b55d6b891bd56f1433895ead804eb0a253a02305"
+            ],
+            "markers": "platform_system == 'Linux'",
+            "version": "==3.4"
+        },
+        "urllib3": {
+            "hashes": [
+                "sha256:9c6c593cb28f52075016307fc26b0a0f8e82bc7d1ff19aaaa959b91710a56c47"
+            ],
+            "version": "==1.25.5"
+        }
+    },
+    "develop": {}
+}

@@ -1,0 +1,6 @@
+absl-py
+attrs
+pygame[emu]
+luma.oled
+luma.emulator[emu]
+requests
