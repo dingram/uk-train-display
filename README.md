@@ -14,8 +14,8 @@ These environment variables can be specified using the [balenaCloud dashboard](h
 |-----------------------|-----------------|-------------
 | `activeTimes`         | (none)          | Optional. One or more time ranges during which the display will show data. See below for more details.
 | `blankTimes`          | (none)          | Optional. One or more time ranges during which the display will be entirely blank. Takes precedence over `activeTimes`. See below for more details.
-| `callingAt`           | (none)          | Optional. One or more [National Rail station codes][station-code], e.g. `BFR` or `BFR,CTK`.
-| `departFrom`          | (none)          | **Required.** A [National Rail station code][station-code], e.g. `STP`.
+| `callingAt`           | (none)          | Optional. A [National Rail station code][station-code] that trains must call at in order to be shown, e.g. `BFR`.
+| `departFrom`          | (none)          | **Required.** A [National Rail station code][station-code] to show departures from, e.g. `STP`.
 | `displayRotation`     | `0`             | Optional. How much to rotate the display; either `0` or `180`. Useful if your display placement is constrained.
 | `minDepartureMin`     | `0`             | Optional. If greater than zero, trains departing in less than this many minutes are not shown. This allows you to hide trains if you can't get to the platform in time to catch them.
 | `outOfHoursName`      | (none)          | Optional. Name shown when current time is outside active hours, e.g. `London St Pancras`. If set to `_clock_`, the display will just show the current time. If set to `_blank_` then the display will be completely blanked.
@@ -71,7 +71,7 @@ would turn off the display overnight, and display a clock and "Welcome to My Hom
 
 ### Calling at
 
-If no station codes are given, all trains from the departure station are shown. If multiple station codes are given, then a train will be shown if it calls at _any_ of them.
+If no station codes are given, all trains from the departure station are shown. If a station code is given, then a train will be shown only if it calls at that station. Note that simply passing through a station without stopping isn't enough.
 
 ### Slow stations
 
