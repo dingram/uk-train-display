@@ -1,0 +1,25 @@
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian-python:3.7-buster
+
+# Use systemd so we see SIGTERM.
+ENV INITSYSTEM on
+
+RUN install_packages \
+        jq \
+        libopenjp2-7 \
+        libfreetype6-dev \
+        libjpeg-dev \
+        libtiff5 && \
+    pip install pipenv --index-url=https://www.piwheels.org/simple
+
+WORKDIR /usr/app
+
+# Copy rarely-modified things early, to minimize layers.
+COPY fonts Pipfile Pipfile.lock balena-run.sh ./
+
+# Also unlikely to change.
+RUN chmod +x balena-run.sh && \
+    pipenv install --ignore-pipfile
+
+COPY src ./src
+
+CMD pipenv run ./balena-run.sh
