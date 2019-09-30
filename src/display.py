@@ -1,4 +1,5 @@
 import datetime
+import enum
 import json
 import os
 import time
@@ -29,6 +30,12 @@ def _make_font(filename, pointsize):
     return PIL.ImageFont.truetype(font_path, pointsize)
 
 
+class DisplayState(enum.Enum):
+  ACTIVE = enum.auto()
+  BLANK = enum.auto()
+  OUT_OF_HOURS = enum.auto()
+
+
 class Controller(object):
 
   def __init__(self, device, station_data, out_of_hours_name, active_times,
@@ -45,10 +52,15 @@ class Controller(object):
     self.font_clock_hhmm = _make_font('Dot Matrix Bold.ttf', 20)
     self.font_clock_secs = _make_font('Dot Matrix Bold Tall.ttf', 10)
 
-    # Set up viewports.
+    # Set up available viewports.
     self._active_viewport = self.display_active()
     self._blank_viewport = self.display_blank()
     self._out_of_hours_viewport = self.display_out_of_hours()
+
+    # Set up current state.
+    self._viewport = None
+    self._current_display_state = None
+    self.update_display_state()
 
     self.device.clear()
 
@@ -56,23 +68,31 @@ class Controller(object):
     logging.info('Starting background data refresh every %d seconds...',
         self.data.refresh_interval)
     while True:
-      if self.is_active:
+      if self.is_active():
         self.data.refresh_if_needed()
       time.sleep(0.5)
 
+  def get_display_state(self, when=None):
+    if not when:
+      when = datetime.datetime.now()
+    if self._blank_times and self._blank_times.is_active(when):
+      return DisplayState.BLANK
+    elif (not self._active_times) or self._active_times.is_active(when):
+      return DisplayState.ACTIVE
+    return DisplayState.OUT_OF_HOURS
+
   @property
+  def display_state(self):
+    return self.get_display_state()
+
   def is_active(self):
-    now = datetime.datetime.now()
-    return (not self._active_times) or self._active_times.is_active(now)
+    return self.display_state == DisplayState.ACTIVE
 
-  @property
   def is_blank(self):
-    now = datetime.datetime.now()
-    return self._blank_times and self._blank_times.is_active(now)
+    return self.display_state == DisplayState.BLANK
 
-  @property
   def is_out_of_hours(self):
-    return (not self.is_active) and (not self.is_blank)
+    return self.display_state == DisplayState.OUT_OF_HOURS
 
   def _render_centered_text(self, draw, text, font=None, y=None):
     if not font:
@@ -189,14 +209,19 @@ class Controller(object):
       view.add_hotspot(self._hotspot_time(), (0, 50))
     return view
 
-  @property
-  def _current_viewport(self):
-    if self.is_blank:
-      return self._blank_viewport
-    elif self.is_active:
-      return self._active_viewport
+  def update_display_state(self):
+    current_state = self.display_state
+    if self._viewport and self._current_display_state == current_state:
+      return
+
+    logging.info('Transitioning display to %s', current_state.name)
+    self._current_display_state = current_state
+    if current_state == DisplayState.BLANK:
+      self._viewport = self._blank_viewport
+    elif current_state == DisplayState.ACTIVE:
+      self._viewport = self._active_viewport
     else:
-      return self._out_of_hours_viewport
+      self._viewport = self._out_of_hours_viewport
 
   def run_forever(self):
     if self._active_times:
@@ -219,4 +244,5 @@ class Controller(object):
 
     while True:
       with regulator:
-        self._current_viewport.refresh()
+        self.update_display_state()
+        self._viewport.refresh()
