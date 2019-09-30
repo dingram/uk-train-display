@@ -127,16 +127,17 @@ class Controller(object):
 
       # Use hardcoded text for seconds to avoid the text moving around due to
       # differences in character widths.
-      hhmm_w, hhmm_h = draw.textsize(hhmm, self.font_clock_hhmm)
       secs_w, secs_h = draw.textsize(':00', self.font_clock_secs)
+      hhmm_w, hhmm_h = draw.textsize(hhmm, self.font_clock_hhmm)
+      hhmm_xoffset = (self.device.width - hhmm_w - secs_w) // 2
 
       draw.text(
-          ((width - hhmm_w - secs_w) // 2, 0),
+          (hhmm_xoffset, 0),
           text=hhmm,
           font=self.font_clock_hhmm,
           fill='yellow')
       draw.text(
-          (((width - hhmm_w - secs_w) // 2) + hhmm_w, hhmm_h - secs_h),
+          (hhmm_xoffset + hhmm_w, hhmm_h - secs_h),
           text=':{:02d}'.format(now.second),
           font=self.font_clock_secs,
           fill='yellow')
