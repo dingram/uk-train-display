@@ -218,9 +218,5 @@ class Controller(object):
     regulator = framerate_regulator(fps=10)
 
     while True:
-      if self.is_active:
-        # TODO: make this asynchronous
-        self.data.refresh_if_needed()
-
       with regulator:
         self._current_viewport.refresh()
