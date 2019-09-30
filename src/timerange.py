@@ -36,23 +36,23 @@ class Day(enum.Enum):
   @staticmethod
   def parse(daystr: str) -> 'Day':
     daystr = daystr.lower()
-    if daystr in ('mon', 'monday'):
+    if daystr in ('mon', 'monday', 'mondays'):
       return Day.MONDAY
-    elif daystr in ('tue', 'tues', 'tuesday'):
+    elif daystr in ('tue', 'tues', 'tuesday', 'tuesdays'):
       return Day.TUESDAY
-    elif daystr in ('wed', 'weds', 'wednesday'):
+    elif daystr in ('wed', 'weds', 'wednesday', 'wednesdays'):
       return Day.WEDNESDAY
-    elif daystr in ('thu', 'thurs', 'thursday'):
+    elif daystr in ('thu', 'thurs', 'thursday', 'thursdays'):
       return Day.THURSDAY
-    elif daystr in ('fri', 'friday'):
+    elif daystr in ('fri', 'friday', 'fridays'):
       return Day.FRIDAY
-    elif daystr in ('sat', 'saturday'):
+    elif daystr in ('sat', 'saturday', 'saturdays'):
       return Day.SATURDAY
-    elif daystr in ('sun', 'sunday'):
+    elif daystr in ('sun', 'sunday', 'sundays'):
       return Day.SUNDAY
-    elif daystr in ('weekday', 'week'):
+    elif daystr in ('weekday', 'weekdays', 'week'):
       return Day.WEEKDAY
-    elif daystr in ('weekend', ):
+    elif daystr in ('weekend', 'weekends'):
       return Day.WEEKEND
     elif daystr in ('', 'all', 'daily', 'every', 'everyday'):
       return Day.DAILY
