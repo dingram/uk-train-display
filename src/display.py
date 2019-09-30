@@ -68,7 +68,7 @@ class Controller(object):
     logging.info('Starting background data refresh every %d seconds...',
         self.data.refresh_interval)
     while True:
-      if self.is_active():
+      if self.is_active() or self.is_active_soon():
         self.data.refresh_if_needed()
       time.sleep(0.5)
 
@@ -87,6 +87,13 @@ class Controller(object):
 
   def is_active(self):
     return self.display_state == DisplayState.ACTIVE
+
+  def is_active_soon(self):
+    # Return True if we are going to become active within two refresh
+    # intervals.
+    when = datetime.datetime.now()
+    when += datetime.timedelta(seconds=self.data.refresh_interval * 2)
+    return self.get_display_state(when) == DisplayState.ACTIVE
 
   def is_blank(self):
     return self.display_state == DisplayState.BLANK
