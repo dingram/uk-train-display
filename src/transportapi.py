@@ -191,6 +191,10 @@ class StationData(object):
     return int(time.monotonic() - self._last_update_counter)
 
   @property
+  def refresh_interval(self):
+    return self._update_interval
+
+  @property
   def is_data_stale(self):
     return self.seconds_since_update > self._update_interval
 

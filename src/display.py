@@ -53,7 +53,8 @@ class Controller(object):
     self.device.clear()
 
   def data_refresher(self):
-    logging.info('Starting background data refresh...')
+    logging.info('Starting background data refresh every %d seconds...',
+        self.data.refresh_interval)
     while True:
       if self.is_active:
         self.data.refresh_if_needed()
