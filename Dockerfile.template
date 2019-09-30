@@ -17,11 +17,11 @@ WORKDIR /usr/app
 COPY fonts ./fonts
 COPY icons ./icons
 COPY Pipfile Pipfile.lock balena-run.sh ./
-
-# Also unlikely to change.
 RUN chmod +x balena-run.sh && \
     pipenv install --ignore-pipfile
 
+# This is going to change far more often, so make sure it is last.
 COPY src ./src
 
-CMD pipenv run ./balena-run.sh
+# Specify command in exec style, so we receive signals.
+CMD ["pipenv", "run", "./balena-run.sh"]

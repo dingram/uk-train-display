@@ -134,9 +134,11 @@ def main(argv):
       out_of_hours_name=FLAGS.out_of_hours_name,
   )
 
-  logging.info('Running controller')
+  logging.info('Setting up SIGTERM handler')
+  signal.signal(signal.SIGTERM, _handle_sigterm)
+
   try:
-    signal.signal(signal.SIGTERM, _handle_sigterm)
+    logging.info('Running controller')
     controller.run_forever()
   except KeyboardInterrupt:
     pass
