@@ -18,19 +18,19 @@ except ImportError:
   pygame = None
 
 import display
+import timerange
 import transportapi
 
 
 FLAGS = flags.FLAGS
 
 
-flags.DEFINE_multi_string('active_times', [],
-                          'One or more time ranges during which the display '
-                          'will show train departures.')
-flags.DEFINE_multi_string('blank_times', [],
-                          'One or more time ranges during which the display '
-                          'will be entirely blank. Takes precedence over '
-                          'active times.')
+flags.DEFINE_string('active_times', '',
+                    'One or more time ranges during which the display will '
+                    'show train departures.')
+flags.DEFINE_string('blank_times', '',
+                    'One or more time ranges during which the display will be '
+                    'entirely blank. Takes precedence over active times.')
 flags.DEFINE_string('calling_at', None,
                     'A National Rail code for a station that a train must call '
                     'at in order to be shown.')
@@ -132,6 +132,8 @@ def main(argv):
       device,
       station_data,
       out_of_hours_name=FLAGS.out_of_hours_name,
+      active_times=timerange.TimeRanges.parse(FLAGS.active_times),
+      blank_times=timerange.TimeRanges.parse(FLAGS.blank_times),
   )
 
   logging.info('Setting up SIGTERM handler')

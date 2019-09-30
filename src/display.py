@@ -31,10 +31,14 @@ def _make_font(filename, pointsize):
 
 class Controller(object):
 
-  def __init__(self, device, station_data, out_of_hours_name):
+  def __init__(self, device, station_data, out_of_hours_name, active_times,
+      blank_times):
     self.device = device
     self.data = station_data
     self._out_of_hours_name = out_of_hours_name
+
+    self._active_times = active_times
+    self._blank_times = blank_times
 
     self.font_default = _make_font('Dot Matrix Regular.ttf', 10)
     self.font_bold = _make_font('Dot Matrix Bold.ttf', 10)
@@ -57,11 +61,13 @@ class Controller(object):
 
   @property
   def is_active(self):
-    return True
+    now = datetime.datetime.now()
+    return (not self._active_times) or self._active_times.is_active(now)
 
   @property
   def is_blank(self):
-    return False
+    now = datetime.datetime.now()
+    return self._blank_times and self._blank_times.is_active(now)
 
   @property
   def is_out_of_hours(self):
@@ -192,6 +198,13 @@ class Controller(object):
       return self._out_of_hours_viewport
 
   def run_forever(self):
+    if self._active_times:
+      logging.info('Active times:\n    %s' % '\n    '.join(
+          ('%r' % t) for t in self._active_times))
+    if self._blank_times:
+      logging.info('Blank times:\n    %s' % '\n    '.join(
+          ('%r' % t) for t in self._blank_times))
+
     logging.info('Loading...')
     with canvas(self.device) as draw:
       self._render_centered_text(draw, 'Loading...', font=self.font_bold)
