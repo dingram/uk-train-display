@@ -97,6 +97,21 @@ class Controller(object):
       dest = dep['destination_name']
       draw.text((0, 0), text=f'{departureTime}  {dest}', font=font,
                 fill='yellow')
+
+      status = '???'
+      if dep['status'] == 'CANCELLED':
+        status = 'CANCELLED'
+      elif dep['aimed_departure_time'] == dep['expected_departure_time']:
+        status = 'On time'
+      elif dep.get('expected_departure_time'):
+        status = f'Exp {dep["expected_departure_time"]}'
+      status = f'  {status}'
+
+      w, _ = draw.textsize(status, font)
+      # Ensure we do not overlap with the station.
+      draw.rectangle([(width - w, 0), (width, height)], fill='black')
+      draw.text((width - w, 0), text=status, font=font, fill='yellow')
+
     return snapshot(self.device.width, 12, _render, interval=10)
 
   def _hotspot_calling_at(self, idx):
