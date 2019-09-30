@@ -14,7 +14,9 @@ RUN install_packages \
 WORKDIR /usr/app
 
 # Copy rarely-modified things early, to minimize layers.
-COPY fonts Pipfile Pipfile.lock balena-run.sh ./
+COPY fonts ./fonts
+COPY icons ./icons
+COPY Pipfile Pipfile.lock balena-run.sh ./
 
 # Also unlikely to change.
 RUN chmod +x balena-run.sh && \
