@@ -27,6 +27,21 @@ function required_arg() {
 }
 
 
+function boolean_arg() {
+  # Add boolean argument from an environment variable.
+  #
+  # Usage: boolean_arg argname envname
+  local invert=""
+  local saved_shopts="$(shopt -p)"
+  shopt -s nocasematch extglob
+  if [[ "${!2}" =~ ^(|0|off|no|false)$ ]]; then
+    invert="no"
+  fi
+  eval "${saved_shopts}"
+  MAIN_ARGS+=( --"${invert}${1}" )
+}
+
+
 function optional_arg() {
   # Add optional argument from an environment variable, with optional default.
   #
@@ -34,8 +49,20 @@ function optional_arg() {
   if [[ -n "${!2}" ]]; then
     required_arg "$@"
   elif [[ -n "${3}" ]]; then
-    MAIN_ARGS+=( --"${1}"="${3}" )
+    typeset "${2}=${3}"
+    required_arg "$@"
   fi
+}
+
+
+function optional_boolean_arg() {
+  # Add optional boolean argument from an environment variable, with default.
+  #
+  # Usage: optional_boolean_arg argname envname default
+  if [[ -z "${!2}" && -n "${!2-unset}" ]]; then
+    typeset "${2}=${3}"
+  fi
+  boolean_arg "$@"
 }
 
 
@@ -80,6 +107,10 @@ function prepare_args() {
 
   # Optional. Name shown when current time is outside active hours.
   optional_arg out_of_hours_name outOfHoursName
+
+  # Optional. Whether to show "calling at" for the first departure. If `false`,
+  # a fourth departure is shown instead.
+  optional_boolean_arg show_calling_at showCallingAt true
 
   # Optional. If a train calls at a station in this list, it is marked "slow".
   optional_arg slow_stations slowStations

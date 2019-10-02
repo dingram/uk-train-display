@@ -65,6 +65,9 @@ flags.DEFINE_string('transport_api_app_id', None,
 flags.DEFINE_string('transport_api_key', None,
                   'Your key for the Transport API. If not given, this will be '
                   'read from the config.json file in the current directory.')
+flags.DEFINE_bool('show_calling_at', True,
+                  'Whether to show the "calling at" line or an extra '
+                  'departure.')
 
 
 def init_emulated_display():
@@ -134,6 +137,7 @@ def main(argv):
       out_of_hours_name=FLAGS.out_of_hours_name,
       active_times=timerange.TimeRanges.parse(FLAGS.active_times),
       blank_times=timerange.TimeRanges.parse(FLAGS.blank_times),
+      show_calling_at=FLAGS.show_calling_at,
   )
 
   logging.info('Setting up SIGTERM handler')

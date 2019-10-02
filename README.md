@@ -20,6 +20,7 @@ These environment variables can be specified using the [balenaCloud dashboard](h
 | `minDepartureMin`     | `0`             | Optional. If greater than zero, trains departing in less than this many minutes are not shown. This allows you to hide trains if you can't get to the platform in time to catch them.
 | `outOfHoursName`      | (none)          | Optional. Name shown when current time is outside active hours, e.g. `London St Pancras`. If set to `_clock_`, the display will just show the current time. If set to `_blank_` then the display will be completely blanked.
 | `slowStations`        | (none)          | Optional. If a train calls at a station in this list, it is marked "slow".
+| `showCallingAt`       | `true`          | Optional. Whether to show "calling at" for the first departure. If `false`, a fourth departure is shown instead.
 | `refreshTime`         | `120`           | Optional. Seconds between data refresh, during active hours. Values will be clamped to the range 15 - 3600, inclusive.
 | `transportApi_apiKey` | (none)          | **Required.** Transport API key, e.g. `feedface8badf00ddecafbaddead`.
 | `transportApi_appId`  | (none)          | **Required.** Transport API application ID, e.g. `12345678`.

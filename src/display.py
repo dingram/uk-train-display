@@ -39,10 +39,11 @@ class DisplayState(enum.Enum):
 class Controller(object):
 
   def __init__(self, device, station_data, out_of_hours_name, active_times,
-      blank_times):
+      blank_times, show_calling_at):
     self.device = device
     self.data = station_data
     self._out_of_hours_name = out_of_hours_name
+    self._show_calling_at = show_calling_at
 
     self._active_times = active_times
     self._blank_times = blank_times
@@ -199,9 +200,15 @@ class Controller(object):
     view = viewport(self.device, self.device.width, self.device.height)
 
     view.add_hotspot(self._hotspot_departure(0), (0, 0))
-    view.add_hotspot(self._hotspot_calling_at(0), (0, 12))
-    view.add_hotspot(self._hotspot_departure(1), (0, 24))
-    view.add_hotspot(self._hotspot_departure(2), (0, 36))
+    if self._show_calling_at:
+      view.add_hotspot(self._hotspot_calling_at(0), (0, 12))
+      view.add_hotspot(self._hotspot_departure(1), (0, 24))
+      view.add_hotspot(self._hotspot_departure(2), (0, 36))
+    else:
+      view.add_hotspot(self._hotspot_departure(1), (0, 12))
+      view.add_hotspot(self._hotspot_departure(2), (0, 24))
+      view.add_hotspot(self._hotspot_departure(3), (0, 36))
+
     view.add_hotspot(self._hotspot_time(), (0, 50))
     view.add_hotspot(
         self._hotspot_data_status(),
