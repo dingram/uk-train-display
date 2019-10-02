@@ -133,7 +133,8 @@ class Controller(object):
                 fill='yellow')
 
       status = dep['status']
-      if dep.get('expected_departure_time') != dep['aimed_departure_time']:
+      if (dep.get('expected_departure_time') and
+          dep['expected_departure_time'] != dep['aimed_departure_time']):
         status = f'Exp {dep["expected_departure_time"]}'
 
       # Reformat some statuses.
