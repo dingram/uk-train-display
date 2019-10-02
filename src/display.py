@@ -11,6 +11,7 @@ from luma.core.sprite_system import framerate_regulator
 from luma.core.virtual import snapshot
 from luma.core.virtual import viewport
 import PIL
+import PIL.ImageOps
 
 import transportapi
 
@@ -28,6 +29,21 @@ def _make_font(filename, pointsize):
         )
     )
     return PIL.ImageFont.truetype(font_path, pointsize)
+
+
+def _make_icon(filename):
+    icon_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'icons',
+            filename
+        )
+    )
+    img = PIL.Image.open(icon_path)
+    img = img.convert('L')
+    img = PIL.ImageOps.invert(img)
+    img = img.convert('1')
+    return img
 
 
 class DisplayState(enum.Enum):
@@ -53,6 +69,9 @@ class Controller(object):
     self.font_bold = _make_font('Dot Matrix Bold.ttf', 10)
     self.font_clock_hhmm = _make_font('Dot Matrix Bold.ttf', 20)
     self.font_clock_secs = _make_font('Dot Matrix Bold Tall.ttf', 10)
+
+    self.icon_error = _make_icon('status-error.png')
+    self.icon_loading = _make_icon('status-loading.png')
 
     # Set up available viewports.
     self._active_viewport = self.display_active()
@@ -180,14 +199,17 @@ class Controller(object):
         if state == transportapi.DataState.IDLE:
           sigil = '.'
         elif state == transportapi.DataState.LOADING:
-          sigil = '*'
+          sigil = self.icon_loading
         elif state == transportapi.DataState.ERROR:
-          sigil = '!'
+          sigil = self.icon_error
         elif self.data.is_stale:
           sigil = 'z'
-        w, h = draw.textsize(sigil, self.font_default)
-        draw.text((width - w, height - h), text=sigil, font=self.font_default,
-            fill='yellow')
+        if isinstance(sigil, str):
+          w, h = draw.textsize(sigil, self.font_default)
+          draw.text((width - w, height - h), text=sigil, font=self.font_default,
+              fill='yellow')
+        else:
+          draw.bitmap((0, 0), sigil, fill='yellow')
     return snapshot(12, 12, _render, interval=0.1)
 
   def _hotspot_time(self):
