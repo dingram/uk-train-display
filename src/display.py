@@ -185,9 +185,10 @@ class Controller(object):
           sigil = '!'
         elif self.data.is_stale:
           sigil = 'z'
-        w, _ = draw.textsize(sigil, self.font_default)
-        draw.text((12 - w, 0), text=sigil, font=self.font_default, fill='yellow')
-    return snapshot(12, 10, _render, interval=0.1)
+        w, h = draw.textsize(sigil, self.font_default)
+        draw.text((width - w, height - h), text=sigil, font=self.font_default,
+            fill='yellow')
+    return snapshot(12, 12, _render, interval=0.1)
 
   def _hotspot_time(self):
     def _render(draw, width, height):
@@ -228,7 +229,7 @@ class Controller(object):
     view.add_hotspot(self._hotspot_time(), (0, 50))
     view.add_hotspot(
         self._hotspot_data_status(),
-        (self.device.width - 12, self.device.height - 10))
+        (self.device.width - 12, self.device.height - 12))
     return view
 
   def display_blank(self):
