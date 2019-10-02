@@ -39,11 +39,12 @@ class DisplayState(enum.Enum):
 class Controller(object):
 
   def __init__(self, device, station_data, out_of_hours_name, active_times,
-      blank_times, show_calling_at):
+      blank_times, show_calling_at, show_update_countdown):
     self.device = device
     self.data = station_data
     self._out_of_hours_name = out_of_hours_name
     self._show_calling_at = show_calling_at
+    self._show_update_countdown = show_update_countdown
 
     self._active_times = active_times
     self._blank_times = blank_times
@@ -159,18 +160,33 @@ class Controller(object):
 
   def _hotspot_data_status(self):
     def _render(draw, width, height):
-      sigil = '?'
       state = self.data.state
-      if state == transportapi.DataState.IDLE:
-        sigil = '.'
-      elif state == transportapi.DataState.LOADING:
-        sigil = '*'
-      elif state == transportapi.DataState.ERROR:
-        sigil = '!'
-      elif self.data.is_stale:
-        sigil = 'z'
-      w, _ = draw.textsize(sigil, self.font_default)
-      draw.text((12 - w, 0), text=sigil, font=self.font_default, fill='yellow')
+      if state == transportapi.DataState.IDLE and self._show_update_countdown:
+        dim = min(width, height)
+        fraction_until_refresh = (
+            self.data.seconds_since_update / self.data.refresh_interval)
+        if fraction_until_refresh < 0.01:
+          draw.ellipse(
+              [(width - dim, height - dim), (width - 1, height - 1)],
+              fill='yellow')
+        else:
+          draw.pieslice(
+              [(width - dim, height - dim), (width - 1, height - 1)],
+              fill='yellow',
+              start=(360 * fraction_until_refresh) - 90,
+              end=-90)
+      else:
+        sigil = '?'
+        if state == transportapi.DataState.IDLE:
+          sigil = '.'
+        elif state == transportapi.DataState.LOADING:
+          sigil = '*'
+        elif state == transportapi.DataState.ERROR:
+          sigil = '!'
+        elif self.data.is_stale:
+          sigil = 'z'
+        w, _ = draw.textsize(sigil, self.font_default)
+        draw.text((12 - w, 0), text=sigil, font=self.font_default, fill='yellow')
     return snapshot(12, 10, _render, interval=0.1)
 
   def _hotspot_time(self):

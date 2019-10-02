@@ -68,6 +68,9 @@ flags.DEFINE_string('transport_api_key', None,
 flags.DEFINE_bool('show_calling_at', True,
                   'Whether to show the "calling at" line or an extra '
                   'departure.')
+flags.DEFINE_bool('show_update_countdown', False,
+                  'Whether to show an indicator of how long until the data is '
+                  'refreshed.')
 
 
 def init_emulated_display():
@@ -138,6 +141,7 @@ def main(argv):
       active_times=timerange.TimeRanges.parse(FLAGS.active_times),
       blank_times=timerange.TimeRanges.parse(FLAGS.blank_times),
       show_calling_at=FLAGS.show_calling_at,
+      show_update_countdown=FLAGS.show_update_countdown,
   )
 
   logging.info('Setting up SIGTERM handler')
