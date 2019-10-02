@@ -132,15 +132,17 @@ class Controller(object):
       draw.text((0, 0), text=f'{departureTime}  {dest}', font=font,
                 fill='yellow')
 
-      status = '???'
-      if dep['status'] == 'CANCELLED':
-        status = 'CANCELLED'
-      elif dep['aimed_departure_time'] == dep['expected_departure_time']:
-        status = 'On time'
-      elif dep.get('expected_departure_time'):
+      status = dep['status']
+      if dep.get('expected_departure_time') != dep['aimed_departure_time']:
         status = f'Exp {dep["expected_departure_time"]}'
-      status = f'  {status}'
 
+      # Reformat some statuses.
+      if status in ('EARLY', 'ON TIME', 'STARTS HERE'):
+        status = 'On time'
+      elif status == 'LATE':
+        status = 'DELAYED'
+
+      status = f'  {status}'
       w, _ = draw.textsize(status, font)
       # Ensure we do not overlap with the station.
       draw.rectangle([(width - w, 0), (width, height)], fill='black')
