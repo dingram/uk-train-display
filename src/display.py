@@ -159,7 +159,17 @@ class Controller(object):
         status = f'Exp {dep["expected_departure_time"]}'
 
       # Reformat some statuses.
-      if status in ('EARLY', 'ON TIME', 'STARTS HERE'):
+      on_time_statuses = {
+          'CHANGE OF IDENTITY',
+          'CHANGE OF ORIGIN',
+          'EARLY',
+          'NO REPORT',
+          'OFF ROUTE',
+          'ON TIME',
+          'REINSTATEMENT',
+          'STARTS HERE',
+      }
+      if status in on_time_statuses:
         status = 'On time'
       elif status == 'LATE':
         status = 'DELAYED'
