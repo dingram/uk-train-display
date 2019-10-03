@@ -59,7 +59,7 @@ class Day(enum.Enum):
     raise ValueError('Unknown day %r' % daystr)
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, slots=True)
 class TimeRange(object):
   start: datetime.time = attr.ib()
   end: datetime.time = attr.ib()
@@ -110,7 +110,7 @@ class TimeRange(object):
         day=day)
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, slots=True)
 class TimeRanges(object):
   ranges: Collection[TimeRange] = attr.ib()
 
