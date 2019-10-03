@@ -120,6 +120,8 @@ def _handle_sigterm(*args):
 
 def main(argv):
   del argv
+  for i, arg in enumerate(sys.argv[1:], start=1):
+    logging.info('argv[%d]: %s', i, arg)
 
   if FLAGS.emulate_display:
     device = init_emulated_display()
