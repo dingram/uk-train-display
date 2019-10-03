@@ -65,6 +65,17 @@ class TimeRange(object):
   end: datetime.time = attr.ib()
   day: Day = attr.ib()
 
+  def __str__(self):
+    return ''.join([
+        'TimeRange(',
+        self.day.name,
+        ': ',
+        self.start.isoformat(),
+        '-',
+        self.end.isoformat(),
+        ')',
+    ])
+
   def is_active(self, dt: datetime.datetime) -> bool:
     dt_time = dt.time()
     if self.start <= self.end:

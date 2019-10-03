@@ -292,10 +292,10 @@ class Controller(object):
   def run_forever(self):
     if self._active_times:
       logging.info('Active times:\n    %s' % '\n    '.join(
-          ('%r' % t) for t in self._active_times))
+          ('%s' % t) for t in self._active_times))
     if self._blank_times:
       logging.info('Blank times:\n    %s' % '\n    '.join(
-          ('%r' % t) for t in self._blank_times))
+          ('%s' % t) for t in self._blank_times))
 
     logging.info('Loading...')
     with canvas(self.device) as draw:
