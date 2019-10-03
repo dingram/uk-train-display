@@ -151,7 +151,7 @@ class TimeRanges(object):
     return False
 
   @classmethod
-  def parse(cls, timeranges: str) -> 'TimeRanges':
+  def parse(cls, timeranges: str, default_active: bool = False) -> 'TimeRanges':
     split_ranges = [r.strip() for r in timeranges.split(',')]
     ranges = [TimeRange.parse(r) for r in split_ranges if r]
-    return cls(ranges)
+    return cls(ranges, default_active)
