@@ -113,6 +113,7 @@ class TimeRange(object):
 @attr.s(frozen=True, slots=True)
 class TimeRanges(object):
   ranges: Collection[TimeRange] = attr.ib()
+  default_active: bool = attr.ib(default=False)
 
   def __len__(self):
     return len(self.ranges)
@@ -121,6 +122,8 @@ class TimeRanges(object):
     return iter(self.ranges)
 
   def is_active(self, dt: datetime.datetime) -> bool:
+    if not self.ranges:
+      return self.default_active
     for r in self.ranges:
       if r.is_active(dt):
         return True
