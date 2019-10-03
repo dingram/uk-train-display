@@ -78,23 +78,31 @@ class TimeRange(object):
 
   def is_active(self, dt: datetime.datetime) -> bool:
     dt_time = dt.time()
-    if self.start <= self.end:
-      return self.day.is_today(dt) and self.start <= dt_time <= self.end
+    if self.start < self.end:
+      # Start and end are on the same day.
+      return self.day.is_today(dt) and self.start <= dt_time < self.end
     else:
+      # Range spans from start time today to end time tomorrow. This also works
+      # for ranges where the start and end times are identical.
       return ((self.day.is_today(dt) and dt_time >= self.start) or
-              (self.day.is_yesterday(dt) and dt_time <= self.end))
+              (self.day.is_yesterday(dt) and dt_time < self.end))
 
   @staticmethod
-  def _parse_time(t: str) -> Tuple[int, int]:
+  def _parse_time(t: str) -> datetime.time:
+    hh, mm = 0, 0
+
     if not t.isdigit():
       raise ValueError('Invalid time %r: must be just digits' % t)
-    hh, mm = 0, 0
+    if len(t) < 1 or len(t) > 4:
+      raise ValueError('Invalid time %r: must be 1-4 digits long' % t)
+
+    # Use offsets from the end for parsing, to allow hour to be a single digit.
     if len(t) > 2:
       hh = int(t[:-2], 10)
-      mm = int(t[2:], 10)
+      mm = int(t[-2:], 10)
     else:
       hh = int(t, 10)
-    return hh, mm
+    return datetime.time(hh, mm)
 
   @classmethod
   def parse(cls, timerange: str) -> 'TimeRange':
@@ -114,10 +122,8 @@ class TimeRange(object):
     start, end = timestr.split('-', 1)
 
     return cls(
-        start=datetime.time(*cls._parse_time(start)),
-        # Go right up to the end of the end minute.
-        end=datetime.time(*cls._parse_time(end), second=59,
-            microsecond=999999),
+        start=cls._parse_time(start),
+        end=cls._parse_time(end),
         day=day)
 
 
