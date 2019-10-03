@@ -54,10 +54,11 @@ class DisplayState(enum.Enum):
 
 class Controller(object):
 
-  def __init__(self, device, station_data, out_of_hours_name, active_times,
-      blank_times, show_calling_at, show_update_countdown):
+  def __init__(self, device, station_data, balena_info, out_of_hours_name,
+      active_times, blank_times, show_calling_at, show_update_countdown):
     self.device = device
     self.data = station_data
+    self.balena = balena_info
     self._out_of_hours_name = out_of_hours_name
     self._show_calling_at = show_calling_at
     self._show_update_countdown = show_update_countdown

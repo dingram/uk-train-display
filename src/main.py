@@ -17,6 +17,7 @@ try:
 except ImportError:
   pygame = None
 
+import balena
 import display
 import timerange
 import transportapi
@@ -141,11 +142,13 @@ def main(argv):
     api_impl = init_real_api(
         FLAGS.transport_api_key, FLAGS.transport_api_app_id)
 
+  balena_info = balena.Balena()
   station_data = transportapi.StationData(api_impl, FLAGS.depart_from,
       calling_at=FLAGS.calling_at, update_interval=FLAGS.refresh_interval)
   controller = display.Controller(
       device,
       station_data,
+      balena_info,
       out_of_hours_name=FLAGS.out_of_hours_name,
       active_times=timerange.TimeRanges.parse(FLAGS.active_times,
           default_active=True),
