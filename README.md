@@ -29,25 +29,28 @@ These environment variables can be specified using the [balenaCloud dashboard](h
 
 ### Time ranges
 
-Active times are a comma-separated list of one or more time ranges. A time range has the following format:
+Active and blank times are a comma-separated list of one or more time ranges. A time range consists of an optional day specifier and a start/end time pair. It has the format `[ddd:]hh[[:]mm[[:]ss]]-hh[[:]mm[[:]ss]]`:
 
- - An optional case-insensitive day (`Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`, `weekday`, `weekend`) followed by a colon.
- - A start time, a hyphen, and an end time. The start and end times must be in the same format, which is one of:
-   - A one- or two-digit hour (0-23).
-   - A zero-padded two-digit hour (00-23).
-   - A full zero-padded four-digit hour and minute (0000-2359).
+ - `ddd:`: An optional case-insensitive day (`Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`, `weekday`, `weekend`, `daily`) followed by a colon.
+ - `hh`: A one- or two-digit hour (0-23) with optional leading zero (00-23).
+ - `mm`: A two-digit minute (00-59) preceded by an optional colon.
+ - `ss`: A two-digit second (00-59) preceded by an optional colon.
+ - If the day is missing, it will be treated as `daily`.
+ - If the minutes or seconds are missing, they will be treated as zero.
 
 Examples of valid time ranges:
 
  - `8-22` = every day, 08:00:00 until 22:00:00.
  - `08-22` = every day, 08:00:00 until 22:00:00.
  - `23-01` = every day, 23:00:00 until 01:00:00 _the following day_.
- - `weekday:8-22` = every day, 08:00:00 until 22:00:00.
- - `weekday:08-22` = every day, 08:00:00 until 22:00:00.
+ - `weekday:8-22` = every weekday, 08:00:00 until 22:00:00.
+ - `weekday:08-22` = every weekday, 08:00:00 until 22:00:00.
  - `weekend:1030-1545` = 19:00:00 Friday until 02:45:00 Saturday.
  - `fri:1930-0245` = 19:00:00 Friday until 02:45:00 Saturday.
 
-It is permitted for time ranges to overlap.
+It is permitted for time ranges to overlap. A time range does include its start time, but *does not* include its end time. This means that an active time of `09:00:00-10:00:00` will become inactive at `10:00:00` exactly.
+
+You can be a bit loose with the day specifiers: `Tue`, `tue`, `tues`, `tuesday`, and `Tuesday` all have the same meaning.
 
 ### Active times, blank times, and out-of-hours times
 
