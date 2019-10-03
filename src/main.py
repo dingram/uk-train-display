@@ -71,6 +71,8 @@ flags.DEFINE_bool('show_calling_at', True,
 flags.DEFINE_bool('show_update_countdown', False,
                   'Whether to show an indicator of how long until the data is '
                   'refreshed.')
+flags.DEFINE_bool('log_env', False,
+                  'Whether to log the current environment variables.')
 
 
 def init_emulated_display():
@@ -120,8 +122,13 @@ def _handle_sigterm(*args):
 
 def main(argv):
   del argv
-  for i, arg in enumerate(sys.argv[1:], start=1):
+  for i, arg in enumerate(sys.argv):
     logging.info('argv[%d]: %s', i, arg)
+  if FLAGS.log_env:
+    for k in sorted(os.environ):
+      v = os.environ[k]
+      logging.info(
+          'ENV[%s]: %s', k, v.encode('unicode_escape').decode('latin-1'))
 
   if FLAGS.emulate_display:
     device = init_emulated_display()
