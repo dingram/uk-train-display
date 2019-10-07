@@ -20,7 +20,25 @@ WIDTH = 256
 HEIGHT = 64
 
 
-def _make_font(filename, pointsize):
+class DisplayState(enum.Enum):
+  ACTIVE = enum.auto()
+  BLANK = enum.auto()
+  OUT_OF_HOURS = enum.auto()
+
+
+class Resources(object):
+
+  def __init__(self):
+    self.font_default = self._load_font('Dot Matrix Regular.ttf', 10)
+    self.font_bold = self._load_font('Dot Matrix Bold.ttf', 10)
+    self.font_clock_hhmm = self._load_font('Dot Matrix Bold.ttf', 20)
+    self.font_clock_secs = self._load_font('Dot Matrix Bold Tall.ttf', 10)
+
+    self.icon_error = self._load_icon('status-error.png')
+    self.icon_loading = self._load_icon('status-loading.png')
+
+  @staticmethod
+  def _load_font(filename, pointsize):
     font_path = os.path.abspath(
         os.path.join(
             os.path.dirname(os.path.dirname(__file__)),
@@ -30,8 +48,8 @@ def _make_font(filename, pointsize):
     )
     return PIL.ImageFont.truetype(font_path, pointsize)
 
-
-def _make_icon(filename):
+  @staticmethod
+  def _load_icon(filename):
     icon_path = os.path.abspath(
         os.path.join(
             os.path.dirname(os.path.dirname(__file__)),
@@ -46,10 +64,6 @@ def _make_icon(filename):
     return img
 
 
-class DisplayState(enum.Enum):
-  ACTIVE = enum.auto()
-  BLANK = enum.auto()
-  OUT_OF_HOURS = enum.auto()
 
 
 class Controller(object):
@@ -66,13 +80,7 @@ class Controller(object):
     self._active_times = active_times
     self._blank_times = blank_times
 
-    self.font_default = _make_font('Dot Matrix Regular.ttf', 10)
-    self.font_bold = _make_font('Dot Matrix Bold.ttf', 10)
-    self.font_clock_hhmm = _make_font('Dot Matrix Bold.ttf', 20)
-    self.font_clock_secs = _make_font('Dot Matrix Bold Tall.ttf', 10)
-
-    self.icon_error = _make_icon('status-error.png')
-    self.icon_loading = _make_icon('status-loading.png')
+    self._res = Resources()
 
     # Set up available viewports.
     self._active_viewport = self.display_active()
@@ -125,21 +133,22 @@ class Controller(object):
 
   def _render_centered_text(self, draw, text, font=None, y=None):
     if not font:
-      font = self.font_default
+      font = self._res.font_default
     text_width, text_height = draw.textsize(text, font)
     if y is None:
       y = (self.device.height - text_height) // 2
     draw.text(
         ((self.device.width - text_width) // 2, y),
         text=text,
-        font=self.font_bold,
+        font=self._res.font_bold,
         fill='yellow')
 
   def _hotspot_out_of_hours_static(self):
     def _render(draw, width, height):
       location = self._out_of_hours_name or self.data.station_name
-      self._render_centered_text(draw, 'Welcome to', font=self.font_bold, y=0)
-      self._render_centered_text(draw, location, font=self.font_bold, y=12)
+      self._render_centered_text(draw, 'Welcome to', font=self._res.font_bold,
+          y=0)
+      self._render_centered_text(draw, location, font=self._res.font_bold, y=12)
     return snapshot(self.device.width, 20, _render, interval=10)
 
   def _hotspot_departure(self, idx):
@@ -147,7 +156,7 @@ class Controller(object):
       deps = self.data.departures
       if idx >= len(deps):
         return
-      font = self.font_default if idx else self.font_bold
+      font = self._res.font_default if idx else self._res.font_bold
       dep = deps[idx]
       departureTime = dep['aimed_departure_time']
       dest = dep['destination_name']
@@ -210,15 +219,15 @@ class Controller(object):
         if state == transportapi.DataState.IDLE:
           sigil = '.'
         elif state == transportapi.DataState.LOADING:
-          sigil = self.icon_loading
+          sigil = self._res.icon_loading
         elif state == transportapi.DataState.ERROR:
-          sigil = self.icon_error
+          sigil = self._res.icon_error
         elif self.data.is_stale:
           sigil = 'z'
         if isinstance(sigil, str):
-          w, h = draw.textsize(sigil, self.font_default)
-          draw.text((width - w, height - h), text=sigil, font=self.font_default,
-              fill='yellow')
+          w, h = draw.textsize(sigil, self._res.font_default)
+          draw.text((width - w, height - h), text=sigil,
+              font=self._res.font_default, fill='yellow')
         else:
           draw.bitmap((0, 0), sigil, fill='yellow')
     return snapshot(12, 12, _render, interval=0.1)
@@ -230,19 +239,19 @@ class Controller(object):
 
       # Use hardcoded text for seconds to avoid the text moving around due to
       # differences in character widths.
-      secs_w, secs_h = draw.textsize(':00', self.font_clock_secs)
-      hhmm_w, hhmm_h = draw.textsize(hhmm, self.font_clock_hhmm)
-      hhmm_xoffset = (self.device.width - hhmm_w - secs_w) // 2
+      secs_w, secs_h = draw.textsize(':00', self._res.font_clock_secs)
+      hhmm_w, hhmm_h = draw.textsize(hhmm, self._res.font_clock_hhmm)
+      hhmm_xoffset = (self.device.width - hhmm_w - secs_w) // 2 - 16
 
       draw.text(
           (hhmm_xoffset, 0),
           text=hhmm,
-          font=self.font_clock_hhmm,
+          font=self._res.font_clock_hhmm,
           fill='yellow')
       draw.text(
           (hhmm_xoffset + hhmm_w, hhmm_h - secs_h),
           text=':{:02d}'.format(now.second),
-          font=self.font_clock_secs,
+          font=self._res.font_clock_secs,
           fill='yellow')
     return snapshot(self.device.width - 16, 14, _render, interval=0.1)
 
@@ -300,7 +309,7 @@ class Controller(object):
 
     logging.info('Loading...')
     with canvas(self.device) as draw:
-      self._render_centered_text(draw, 'Loading...', font=self.font_bold)
+      self._render_centered_text(draw, 'Loading...', font=self._res.font_bold)
 
     async_refresh = threading.Thread(target=self.data_refresher, daemon=True)
     self.data.force_refresh()
