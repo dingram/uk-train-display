@@ -29,6 +29,7 @@ class TimeWidget(snapshot):
     del draw
     del im
 
+    # Width/height should be 62/14, but it's better to calculate it.
     super().__init__(
         width=hhmm_w + self._secs_w,
         height=max(hhmm_h, self._secs_h),
@@ -41,6 +42,8 @@ class TimeWidget(snapshot):
     hhmm_w, hhmm_h = draw.textsize(hhmm, self._res.font_clock_hhmm)
     hhmm_xoffset = (self.width - hhmm_w - self._secs_w) // 2
 
+    # Add masking rectangle, so we don't clash with anything underneath.
+    draw.rectangle([(0, 0), (self.width, self.height)], fill='black')
     draw.text(
         (hhmm_xoffset, 0),
         text=hhmm,
