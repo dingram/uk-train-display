@@ -1,6 +1,5 @@
 import datetime
 import enum
-import json
 import os
 import time
 import threading
@@ -15,6 +14,7 @@ from PIL import ImageFont
 from PIL import ImageOps
 
 import transportapi
+import widgets
 
 
 WIDTH = 256
@@ -233,28 +233,6 @@ class Controller(object):
           draw.bitmap((0, 0), sigil, fill='yellow')
     return snapshot(12, 12, _render, interval=0.1)
 
-  def _hotspot_time(self):
-    def _render(draw, width, height):
-      now = datetime.datetime.now().time()
-      hhmm = now.strftime('%H:%M')
-
-      # Use hardcoded text for seconds to avoid the text moving around due to
-      # differences in character widths.
-      secs_w, secs_h = draw.textsize(':00', self._res.font_clock_secs)
-      hhmm_w, hhmm_h = draw.textsize(hhmm, self._res.font_clock_hhmm)
-      hhmm_xoffset = (self.device.width - hhmm_w - secs_w) // 2 - 16
-
-      draw.text(
-          (hhmm_xoffset, 0),
-          text=hhmm,
-          font=self._res.font_clock_hhmm,
-          fill='yellow')
-      draw.text(
-          (hhmm_xoffset + hhmm_w, hhmm_h - secs_h),
-          text=':{:02d}'.format(now.second),
-          font=self._res.font_clock_secs,
-          fill='yellow')
-    return snapshot(self.device.width - 16, 14, _render, interval=0.1)
 
   def display_active(self):
     view = viewport(self.device, self.device.width, self.device.height)
@@ -269,7 +247,11 @@ class Controller(object):
       view.add_hotspot(self._hotspot_departure(2), (0, 24))
       view.add_hotspot(self._hotspot_departure(3), (0, 36))
 
-    view.add_hotspot(self._hotspot_time(), (0, 50))
+    time_widget = widgets.TimeWidget(self._res)
+    view.add_hotspot(
+        time_widget,
+        ((self.device.width - time_widget.width) // 2,
+            self.device.height - time_widget.height))
     view.add_hotspot(
         self._hotspot_data_status(),
         (self.device.width - 12, self.device.height - 12))
@@ -283,7 +265,12 @@ class Controller(object):
     if self._out_of_hours_name not in ('_blank_', '_clock_'):
       view.add_hotspot(self._hotspot_out_of_hours_static(), (0, 0))
     if self._out_of_hours_name != '_blank_':
-      view.add_hotspot(self._hotspot_time(), (0, 50))
+      time_widget = widgets.TimeWidget(self._res)
+      view.add_hotspot(
+          time_widget,
+          ((self.device.width - time_widget.width) // 2,
+              self.device.height - time_widget.height))
+
     return view
 
   def update_display_state(self):
