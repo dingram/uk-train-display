@@ -43,7 +43,8 @@ class TimeWidget(snapshot):
     hhmm_xoffset = (self.width - hhmm_w - self._secs_w) // 2
 
     # Add masking rectangle, so we don't clash with anything underneath.
-    draw.rectangle([(0, 0), (self.width, self.height)], fill='black')
+    draw.rectangle(
+        [(0, 0), (self.width, self.height)], fill=self._res.background)
     draw.text(
         (hhmm_xoffset, 0),
         text=hhmm,
@@ -88,7 +89,8 @@ class OutOfHoursWidget(snapshot):
     welcome_w, welcome_h = draw.textsize(self.WELCOME_TEXT, self._res.font_bold)
     location_w, location_h = draw.textsize(location, self._res.font_bold)
 
-    draw.rectangle([(0, 0), (self.width, self.height)], fill='black')
+    draw.rectangle(
+        [(0, 0), (self.width, self.height)], fill=self._res.background)
     draw.text(
         ((self.width - welcome_w) // 2, 0),
         text=self.WELCOME_TEXT,

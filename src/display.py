@@ -32,6 +32,8 @@ class Resources(object):
   def __init__(self):
     self.full_width = WIDTH
     self.full_height = HEIGHT
+    self.background = 'black'
+    self.foreground = 'yellow'
 
     self.font_default = self._load_font('Dot Matrix Regular.ttf', 10)
     self.font_bold = self._load_font('Dot Matrix Bold.ttf', 10)
@@ -145,7 +147,7 @@ class Controller(object):
         ((self.device.width - text_width) // 2, y),
         text=text,
         font=self._res.font_bold,
-        fill='yellow')
+        fill=self._res.foreground)
 
   def _hotspot_departure(self, idx):
     def _render(draw, width, height):
@@ -157,7 +159,7 @@ class Controller(object):
       departureTime = dep['aimed_departure_time']
       dest = dep['destination_name']
       draw.text((0, 0), text=f'{departureTime}  {dest}', font=font,
-                fill='yellow')
+                fill=self._res.foreground)
 
       status = dep['status']
       if (dep.get('expected_departure_time') and
@@ -183,8 +185,10 @@ class Controller(object):
       status = f'  {status}'
       w, _ = draw.textsize(status, font)
       # Ensure we do not overlap with the station.
-      draw.rectangle([(width - w, 0), (width, height)], fill='black')
-      draw.text((width - w, 0), text=status, font=font, fill='yellow')
+      draw.rectangle(
+          [(width - w, 0), (width, height)], fill=self._res.background)
+      draw.text(
+          (width - w, 0), text=status, font=font, fill=self._res.foreground)
 
     return snapshot(self.device.width, 12, _render, interval=10)
 
@@ -203,11 +207,11 @@ class Controller(object):
         if fraction_until_refresh < 0.01:
           draw.ellipse(
               [(width - dim, height - dim), (width - 1, height - 1)],
-              fill='yellow')
+              fill=self._res.foreground)
         else:
           draw.pieslice(
               [(width - dim, height - dim), (width - 1, height - 1)],
-              fill='yellow',
+              fill=self._res.foreground,
               start=(360 * fraction_until_refresh) - 90,
               end=-90)
       else:
@@ -223,9 +227,9 @@ class Controller(object):
         if isinstance(sigil, str):
           w, h = draw.textsize(sigil, self._res.font_default)
           draw.text((width - w, height - h), text=sigil,
-              font=self._res.font_default, fill='yellow')
+              font=self._res.font_default, fill=self._res.foreground)
         else:
-          draw.bitmap((0, 0), sigil, fill='yellow')
+          draw.bitmap((0, 0), sigil, fill=self._res.foreground)
     return snapshot(12, 12, _render, interval=0.1)
 
 
