@@ -147,14 +147,6 @@ class Controller(object):
         font=self._res.font_bold,
         fill='yellow')
 
-  def _hotspot_out_of_hours_static(self):
-    def _render(draw, width, height):
-      location = self._out_of_hours_name or self.data.station_name
-      self._render_centered_text(draw, 'Welcome to', font=self._res.font_bold,
-          y=0)
-      self._render_centered_text(draw, location, font=self._res.font_bold, y=12)
-    return snapshot(self.device.width, 20, _render, interval=10)
-
   def _hotspot_departure(self, idx):
     def _render(draw, width, height):
       deps = self.data.departures
@@ -266,7 +258,11 @@ class Controller(object):
   def display_out_of_hours(self):
     view = viewport(self.device, self.device.width, self.device.height)
     if self._out_of_hours_name not in ('_blank_', '_clock_'):
-      view.add_hotspot(self._hotspot_out_of_hours_static(), (0, 0))
+      ooh_widget = widgets.OutOfHoursWidget(
+          self._res, self.data, self._out_of_hours_name)
+      view.add_hotspot(
+          ooh_widget,
+          ((self.device.width - ooh_widget.width) // 2, 0))
     if self._out_of_hours_name != '_blank_':
       time_widget = widgets.TimeWidget(self._res)
       view.add_hotspot(
