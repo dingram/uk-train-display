@@ -7,12 +7,13 @@ from PIL import ImageDraw
 
 
 class TimeWidget(snapshot):
+  """Widget for rendering the current time."""
 
   def __init__(self, resources):
     self._res = resources
 
     # Calculate how big we need to be.
-    im = Image.new('1', (256, 256))
+    im = Image.new('1', (self._res.full_width, self._res.full_height))
     draw = ImageDraw.Draw(im)
 
     # Cache the text size for seconds so we don't have to keep recalculating

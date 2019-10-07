@@ -30,6 +30,9 @@ class DisplayState(enum.Enum):
 class Resources(object):
 
   def __init__(self):
+    self.full_width = WIDTH
+    self.full_height = HEIGHT
+
     self.font_default = self._load_font('Dot Matrix Regular.ttf', 10)
     self.font_bold = self._load_font('Dot Matrix Bold.ttf', 10)
     self.font_clock_hhmm = self._load_font('Dot Matrix Bold.ttf', 20)
