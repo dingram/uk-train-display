@@ -10,8 +10,9 @@ from luma.core.render import canvas
 from luma.core.sprite_system import framerate_regulator
 from luma.core.virtual import snapshot
 from luma.core.virtual import viewport
-import PIL
-import PIL.ImageOps
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageOps
 
 import transportapi
 
@@ -46,7 +47,7 @@ class Resources(object):
             filename
         )
     )
-    return PIL.ImageFont.truetype(font_path, pointsize)
+    return ImageFont.truetype(font_path, pointsize)
 
   @staticmethod
   def _load_icon(filename):
@@ -57,9 +58,9 @@ class Resources(object):
             filename
         )
     )
-    img = PIL.Image.open(icon_path)
+    img = Image.open(icon_path)
     img = img.convert('L')
-    img = PIL.ImageOps.invert(img)
+    img = ImageOps.invert(img)
     img = img.convert('1')
     return img
 
