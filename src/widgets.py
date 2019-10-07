@@ -49,12 +49,12 @@ class TimeWidget(snapshot):
         (hhmm_xoffset, 0),
         text=hhmm,
         font=self._res.font_clock_hhmm,
-        fill='yellow')
+        fill=self._res.foreground)
     draw.text(
         (hhmm_xoffset + hhmm_w, self.height - self._secs_h),
         text=':{:02d}'.format(now.second),
         font=self._res.font_clock_secs,
-        fill='yellow')
+        fill=self._res.foreground)
 
 
 class OutOfHoursWidget(snapshot):
@@ -95,9 +95,9 @@ class OutOfHoursWidget(snapshot):
         ((self.width - welcome_w) // 2, 0),
         text=self.WELCOME_TEXT,
         font=self._res.font_bold,
-        fill='yellow')
+        fill=self._res.foreground)
     draw.text(
         ((self.width - location_w) // 2, welcome_h + 2),
         text=location,
         font=self._res.font_bold,
-        fill='yellow')
+        fill=self._res.foreground)

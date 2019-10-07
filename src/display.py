@@ -33,7 +33,7 @@ class Resources(object):
     self.full_width = WIDTH
     self.full_height = HEIGHT
     self.background = 'black'
-    self.foreground = 'yellow'
+    self.foreground = '#f8c41b'
 
     self.font_default = self._load_font('Dot Matrix Regular.ttf', 10)
     self.font_bold = self._load_font('Dot Matrix Bold.ttf', 10)
