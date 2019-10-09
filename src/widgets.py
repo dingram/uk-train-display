@@ -6,16 +6,30 @@ from PIL import Image
 from PIL import ImageDraw
 
 
-class TimeWidget(snapshot):
+class Widget(snapshot):
+  """Base widget class."""
+
+  def __init__(self, resources, interval):
+    self._res = resources
+    width, height = self._get_max_size()
+    super().__init__(width=width, height=height, interval=interval)
+
+  def _get_max_size(self):
+    im = Image.new('1', (self._res.full_width, self._res.full_height))
+    draw = ImageDraw.Draw(im)
+    width, height = self._measure_max_size(draw)
+    del draw
+    del im
+    return width, height
+
+
+class TimeWidget(Widget):
   """Widget for rendering the current time."""
 
   def __init__(self, resources):
-    self._res = resources
+    super().__init__(resources, interval=0.1)
 
-    # Calculate how big we need to be.
-    im = Image.new('1', (self._res.full_width, self._res.full_height))
-    draw = ImageDraw.Draw(im)
-
+  def _measure_max_size(self, draw):
     # Cache the text size for seconds so we don't have to keep recalculating
     # it. We use a static string because it updates frequently and we don't
     # want it to move around due to the difference in character widths.
@@ -26,14 +40,8 @@ class TimeWidget(snapshot):
     self._secs_w, self._secs_h = draw.textsize(':00', self._res.font_clock_secs)
     hhmm_w, hhmm_h = draw.textsize('00:00', self._res.font_clock_hhmm)
 
-    del draw
-    del im
-
     # Width/height should be 62/14, but it's better to calculate it.
-    super().__init__(
-        width=hhmm_w + self._secs_w,
-        height=max(hhmm_h, self._secs_h),
-        interval=0.1)
+    return hhmm_w + self._secs_w, max(hhmm_h, self._secs_h)
 
   def update(self, draw):
     now = datetime.datetime.now().time()
@@ -57,32 +65,23 @@ class TimeWidget(snapshot):
         fill=self._res.foreground)
 
 
-class OutOfHoursWidget(snapshot):
+class OutOfHoursWidget(Widget):
   """Widget for rendering the "out of hours" text."""
   WELCOME_TEXT = 'Welcome to'
 
   def __init__(self, resources, station_data, out_of_hours_name):
-    self._res = resources
+    super().__init__(resources, interval=60)
     self._data = station_data
     self._name = out_of_hours_name
 
-    # Calculate how big we need to be.
-    im = Image.new('1', (self._res.full_width, self._res.full_height))
-    draw = ImageDraw.Draw(im)
-
+  def _measure_max_size(self, draw):
     _, welcome_h = draw.textsize(self.WELCOME_TEXT, self._res.font_bold)
     # Use the maximum height of any letter, including ascenders and descenders.
     _, max_location_h = draw.textsize(
         '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
         self._res.font_bold)
 
-    del draw
-    del im
-
-    super().__init__(
-        width=self._res.full_width,
-        height=welcome_h + 2 + max_location_h,
-        interval=60)
+    return self._res.full_width, welcome_h + 2 + max_location_h
 
   def update(self, draw):
     location = self._name or self._data.station_name
