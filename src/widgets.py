@@ -65,16 +65,13 @@ class TimeWidget(Widget):
     hhmm_w, hhmm_h = self._res.textsize(hhmm, self._res.font_clock_hhmm)
     hhmm_xoffset = (self.width - hhmm_w - self._secs_w) // 2
 
-    draw.text(
-        (hhmm_xoffset, 0),
-        text=hhmm,
-        font=self._res.font_clock_hhmm,
-        fill=self._res.foreground)
-    draw.text(
+    self._res.text(
+        draw, (hhmm_xoffset, 0), hhmm, font=self._res.font_clock_hhmm)
+    self._res.text(
+        draw,
         (hhmm_xoffset + hhmm_w, self.height - self._secs_h),
-        text=':{:02d}'.format(now.second),
-        font=self._res.font_clock_secs,
-        fill=self._res.foreground)
+        ':{:02d}'.format(now.second),
+        font=self._res.font_clock_secs)
 
   def preferred_position(self, host):
     return ((host.width - self.width) // 2, host.height - self.height)
@@ -103,16 +100,16 @@ class OutOfHoursWidget(Widget):
         self.WELCOME_TEXT, self._res.font_bold)
     location_w, location_h = self._res.textsize(location, self._res.font_bold)
 
-    draw.text(
+    self._res.text(
+        draw,
         ((self.width - welcome_w) // 2, 0),
-        text=self.WELCOME_TEXT,
-        font=self._res.font_bold,
-        fill=self._res.foreground)
-    draw.text(
+        self.WELCOME_TEXT,
+        font=self._res.font_bold)
+    self._res.text(
+        draw,
         ((self.width - location_w) // 2, welcome_h + self.LINE_SEP),
-        text=location,
-        font=self._res.font_bold,
-        fill=self._res.foreground)
+        location,
+        font=self._res.font_bold)
 
   def preferred_position(self, host):
     return 0, 0
@@ -158,8 +155,7 @@ class DataStatusWidget(Widget):
         sigil = 'z'
       if isinstance(sigil, str):
         w, h = self._res.textsize(sigil, self._res.font_default)
-        draw.text((width - w, height - h), text=sigil,
-            font=self._res.font_default, fill=self._res.foreground)
+        self._res.text(draw, (self.width - w, self.height - h), sigil)
       else:
         draw.bitmap((0, 0), sigil, fill=self._res.foreground)
 

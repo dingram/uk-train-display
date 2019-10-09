@@ -79,6 +79,20 @@ class Resources(object):
         font or self.font_default)
     return max_h
 
+  def text(self, draw, pos, text, font=None, mask=False):
+    """Convenience function for rendering text."""
+    if not font:
+      font = self.font_default
+    x, y = pos
+    if mask:
+      w, h = draw.textsize(text, font)
+      draw.rectangle([(x, y), (x + w, y + h)], fill=self.background)
+    draw.text(
+        (x, y),
+        text=text,
+        font=font or self.font_default,
+        fill=self.foreground)
+
   def textsize(self, text, font=None):
     """Convenience function to avoid creating images to measure text."""
     return self._draw.textsize(text, font or self.font_default)
@@ -155,11 +169,8 @@ class Controller(object):
     text_width, text_height = self._res.textsize(text, font)
     if y is None:
       y = (self.device.height - text_height) // 2
-    draw.text(
-        ((self.device.width - text_width) // 2, y),
-        text=text,
-        font=self._res.font_bold,
-        fill=self._res.foreground)
+    self._res.text(
+        draw, ((self.device.width - text_width) // 2, y), text, font=font)
 
   def _hotspot_departure(self, idx):
     def _render(draw, width, height):
@@ -170,8 +181,7 @@ class Controller(object):
       dep = deps[idx]
       departureTime = dep['aimed_departure_time']
       dest = dep['destination_name']
-      draw.text((0, 0), text=f'{departureTime}  {dest}', font=font,
-                fill=self._res.foreground)
+      self._res.text(draw, (0, 0), text=f'{departureTime}  {dest}', font=font)
 
       status = dep['status']
       if (dep.get('expected_departure_time') and
@@ -196,11 +206,8 @@ class Controller(object):
 
       status = f'  {status}'
       w, _ = self._res.textsize(status, font)
-      # Ensure we do not overlap with the station.
-      draw.rectangle(
-          [(width - w, 0), (width, height)], fill=self._res.background)
-      draw.text(
-          (width - w, 0), text=status, font=font, fill=self._res.foreground)
+      # Mask the text so the output does not overlap with the station.
+      self._res.text(draw, (width - w, 0), text=status, font=font, mask=True)
 
     return snapshot(self.device.width, 12, _render, interval=10)
 
