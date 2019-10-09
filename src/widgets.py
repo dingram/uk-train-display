@@ -26,7 +26,7 @@ class Widget(snapshot, metaclass=abc.ABCMeta):
     # Mask out the background to be sure the widget doesn't clash with anything
     # underneath.
     draw.rectangle(
-        [(0, 0), (self.width, self.height)], fill='blue' or self._res.background)
+        [(0, 0), (self.width, self.height)], fill=self._res.widget_background)
     self._update(draw)
 
   def preferred_position(self, host) -> Tuple[int, int]:
