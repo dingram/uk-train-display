@@ -173,58 +173,24 @@ class Controller(object):
     self._res.text(
         draw, ((self.device.width - text_width) // 2, y), text, font=font)
 
-  def _hotspot_departure(self, idx):
-    def _render(draw, width, height):
-      deps = self.data.departures
-      if idx >= len(deps):
-        return
-      font = self._res.font_default if idx else self._res.font_bold
-      dep = deps[idx]
-      departureTime = dep['aimed_departure_time']
-      dest = dep['destination_name']
-      self._res.text(draw, (0, 0), text=f'{departureTime}  {dest}', font=font)
-
-      status = dep['status']
-      if (dep.get('expected_departure_time') and
-          dep['expected_departure_time'] != dep['aimed_departure_time']):
-        status = f'Exp {dep["expected_departure_time"]}'
-
-      # Reformat some statuses.
-      on_time_statuses = {
-          'CHANGE OF IDENTITY',
-          'CHANGE OF ORIGIN',
-          'EARLY',
-          'NO REPORT',
-          'OFF ROUTE',
-          'ON TIME',
-          'REINSTATEMENT',
-          'STARTS HERE',
-      }
-      if status in on_time_statuses:
-        status = 'On time'
-      elif status == 'LATE':
-        status = 'DELAYED'
-
-      status = f'  {status}'
-      w, _ = self._res.textsize(status, font)
-      # Mask the text so the output does not overlap with the station.
-      self._res.text(draw, (width - w, 0), text=status, font=font, mask=True)
-
-    return snapshot(self.device.width, 12, _render, interval=10)
-
   def display_active(self):
     view = viewport(self.device, self.device.width, self.device.height)
 
-    view.add_hotspot(self._hotspot_departure(0), (0, 0))
+    view.add_hotspot(widgets.DepartureWidget(self._res, self.data, 0), (0, 0))
     if self._show_calling_at:
       view.add_hotspot(widgets.CallingAtWidget(
           self._res, self.data, 0), (0, 12))
-      view.add_hotspot(self._hotspot_departure(1), (0, 24))
-      view.add_hotspot(self._hotspot_departure(2), (0, 36))
+      view.add_hotspot(widgets.DepartureWidget(
+          self._res, self.data, 1), (0, 24))
+      view.add_hotspot(widgets.DepartureWidget(
+          self._res, self.data, 2), (0, 36))
     else:
-      view.add_hotspot(self._hotspot_departure(1), (0, 12))
-      view.add_hotspot(self._hotspot_departure(2), (0, 24))
-      view.add_hotspot(self._hotspot_departure(3), (0, 36))
+      view.add_hotspot(widgets.DepartureWidget(
+          self._res, self.data, 1), (0, 12))
+      view.add_hotspot(widgets.DepartureWidget(
+          self._res, self.data, 2), (0, 24))
+      view.add_hotspot(widgets.DepartureWidget(
+          self._res, self.data, 3), (0, 36))
 
     widgets.TimeWidget(self._res).add_to(view, device=self.device)
     data_widget = widgets.DataStatusWidget(

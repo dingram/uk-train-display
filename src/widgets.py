@@ -115,6 +115,65 @@ class OutOfHoursWidget(Widget):
     return 0, 0
 
 
+class DepartureWidget(Widget):
+  """Widget for rendering a single departure line."""
+
+  def __init__(self, resources, station_data, departure_index):
+    self.__font = None
+    self._data = station_data
+    self._index = departure_index
+    super().__init__(resources, interval=0.1)
+
+  @property
+  def _font(self):
+    if self.__font is None:
+      if self._index == 0:
+        self.__font = self._res.font_bold
+      else:
+        self.__font = self._res.font_default
+    return self.__font
+
+  def _get_max_size(self):
+    return self._res.full_width, self._res.line_height(self._font)
+
+  def _update(self, draw):
+    deps = self._data.departures
+    if self._index >= len(deps):
+      return
+    dep = deps[self._index]
+    departureTime = dep['aimed_departure_time']
+    dest = dep['destination_name']
+    self._res.text(
+        draw, (0, 0), text=f'{departureTime}  {dest}', font=self._font)
+
+    status = dep['status']
+    if (dep.get('expected_departure_time') and
+        dep['expected_departure_time'] != dep['aimed_departure_time']):
+      status = f'Exp {dep["expected_departure_time"]}'
+
+    # Reformat some statuses.
+    on_time_statuses = {
+        'CHANGE OF IDENTITY',
+        'CHANGE OF ORIGIN',
+        'EARLY',
+        'NO REPORT',
+        'OFF ROUTE',
+        'ON TIME',
+        'REINSTATEMENT',
+        'STARTS HERE',
+    }
+    if status in on_time_statuses:
+      status = 'On time'
+    elif status == 'LATE':
+      status = 'DELAYED'
+
+    status = f'  {status}'
+    w, _ = self._res.textsize(status, self._font)
+    # Mask the text so the output does not overlap with the station.
+    self._res.text(
+        draw, (self.width - w, 0), text=status, font=self.__font, mask=True)
+
+
 class CallingAtWidget(Widget):
   """Widget for rendering a single "calling at" line."""
   CALLING_AT_TEXT = 'Calling at:'
