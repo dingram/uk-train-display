@@ -136,10 +136,12 @@ class DataStatusWidget(Widget):
       if fraction_until_refresh < 0.01:
         draw.ellipse(
             [(0, 0), (self.width - 1, self.height - 1)],
+            width=0,
             fill=self._res.foreground)
       elif fraction_until_refresh < 1:
         draw.pieslice(
             [(0, 0), (self.width - 1, self.height - 1)],
+            width=0,
             fill=self._res.foreground,
             start=(360 * fraction_until_refresh) - 90,
             end=-90)

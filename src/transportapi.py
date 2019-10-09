@@ -188,7 +188,7 @@ class StationData(object):
 
   @property
   def seconds_since_update(self):
-    return int(time.monotonic() - self._last_update_counter)
+    return time.monotonic() - self._last_update_counter
 
   @property
   def refresh_interval(self):
