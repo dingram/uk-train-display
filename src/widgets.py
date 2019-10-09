@@ -22,6 +22,13 @@ class Widget(snapshot, metaclass=abc.ABCMeta):
   def _get_max_size(self) -> Tuple[int, int]:
     ...
 
+  def update(self, draw):
+    # Mask out the background to be sure the widget doesn't clash with anything
+    # underneath.
+    draw.rectangle(
+        [(0, 0), (self.width, self.height)], fill='blue' or self._res.background)
+    self._update(draw)
+
   def preferred_position(self, host) -> Tuple[int, int]:
     raise NotImplementedError(
         'No preferred position for %s' % self.__class__.__name__)
@@ -51,16 +58,13 @@ class TimeWidget(Widget):
     # Width/height should be 62/14, but it's better to calculate it.
     return hhmm_w + self._secs_w, max(hhmm_h, self._secs_h)
 
-  def update(self, draw):
+  def _update(self, draw):
     now = datetime.datetime.now().time()
     hhmm = now.strftime('%H:%M')
 
     hhmm_w, hhmm_h = self._res.textsize(hhmm, self._res.font_clock_hhmm)
     hhmm_xoffset = (self.width - hhmm_w - self._secs_w) // 2
 
-    # Add masking rectangle, so we don't clash with anything underneath.
-    draw.rectangle(
-        [(0, 0), (self.width, self.height)], fill=self._res.background)
     draw.text(
         (hhmm_xoffset, 0),
         text=hhmm,
@@ -94,14 +98,12 @@ class OutOfHoursWidget(Widget):
 
     return self._res.full_width, welcome_h + 2 + max_location_h
 
-  def update(self, draw):
+  def _update(self, draw):
     location = self._name or self._data.station_name
     welcome_w, welcome_h = self._res.textsize(
         self.WELCOME_TEXT, self._res.font_bold)
     location_w, location_h = self._res.textsize(location, self._res.font_bold)
 
-    draw.rectangle(
-        [(0, 0), (self.width, self.height)], fill=self._res.background)
     draw.text(
         ((self.width - welcome_w) // 2, 0),
         text=self.WELCOME_TEXT,
@@ -128,7 +130,7 @@ class DataStatusWidget(Widget):
   def _get_max_size(self):
     return 12, 12
 
-  def update(self, draw):
+  def _update(self, draw):
     state = self._data.state
     if state == transportapi.DataState.IDLE and self._show_update_countdown:
       fraction_until_refresh = (
