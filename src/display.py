@@ -10,6 +10,7 @@ from luma.core.sprite_system import framerate_regulator
 from luma.core.virtual import snapshot
 from luma.core.virtual import viewport
 from PIL import Image
+from PIL import ImageDraw
 from PIL import ImageFont
 from PIL import ImageOps
 
@@ -43,6 +44,9 @@ class Resources(object):
     self.icon_error = self._load_icon('status-error.png')
     self.icon_loading = self._load_icon('status-loading.png')
 
+    self._im = Image.new('1', (self.full_width, self.full_height))
+    self._draw = ImageDraw.Draw(self._im)
+
   @staticmethod
   def _load_font(filename, pointsize):
     font_path = os.path.abspath(
@@ -69,7 +73,9 @@ class Resources(object):
     img = img.convert('1')
     return img
 
-
+  def textsize(self, text, font=None):
+    """Convenience function to avoid creating images to measure text."""
+    return self._draw.textsize(text, font or self.font_default)
 
 
 class Controller(object):
@@ -140,7 +146,7 @@ class Controller(object):
   def _render_centered_text(self, draw, text, font=None, y=None):
     if not font:
       font = self._res.font_default
-    text_width, text_height = draw.textsize(text, font)
+    text_width, text_height = self._res.textsize(text, font)
     if y is None:
       y = (self.device.height - text_height) // 2
     draw.text(
@@ -183,7 +189,7 @@ class Controller(object):
         status = 'DELAYED'
 
       status = f'  {status}'
-      w, _ = draw.textsize(status, font)
+      w, _ = self._res.textsize(status, font)
       # Ensure we do not overlap with the station.
       draw.rectangle(
           [(width - w, 0), (width, height)], fill=self._res.background)
@@ -225,7 +231,7 @@ class Controller(object):
         elif self.data.is_stale:
           sigil = 'z'
         if isinstance(sigil, str):
-          w, h = draw.textsize(sigil, self._res.font_default)
+          w, h = self._res.textsize(sigil, self._res.font_default)
           draw.text((width - w, height - h), text=sigil,
               font=self._res.font_default, fill=self._res.foreground)
         else:

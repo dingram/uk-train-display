@@ -1,4 +1,6 @@
+import abc
 import datetime
+from typing import Tuple
 
 from luma.core.virtual import snapshot
 
@@ -6,7 +8,7 @@ from PIL import Image
 from PIL import ImageDraw
 
 
-class Widget(snapshot):
+class Widget(snapshot, metaclass=abc.ABCMeta):
   """Base widget class."""
 
   def __init__(self, resources, interval):
@@ -14,15 +16,11 @@ class Widget(snapshot):
     width, height = self._get_max_size()
     super().__init__(width=width, height=height, interval=interval)
 
-  def _get_max_size(self):
-    im = Image.new('1', (self._res.full_width, self._res.full_height))
-    draw = ImageDraw.Draw(im)
-    width, height = self._measure_max_size(draw)
-    del draw
-    del im
-    return width, height
+  @abc.abstractmethod
+  def _get_max_size(self) -> Tuple[int, int]:
+    ...
 
-  def preferred_position(self, host):
+  def preferred_position(self, host) -> Tuple[int, int]:
     raise NotImplementedError(
         'No preferred position for %s' % self.__class__.__name__)
 
@@ -36,7 +34,7 @@ class TimeWidget(Widget):
   def __init__(self, resources):
     super().__init__(resources, interval=0.1)
 
-  def _measure_max_size(self, draw):
+  def _get_max_size(self):
     # Cache the text size for seconds so we don't have to keep recalculating
     # it. We use a static string because it updates frequently and we don't
     # want it to move around due to the difference in character widths.
@@ -44,8 +42,9 @@ class TimeWidget(Widget):
     # Ideally we want to be even more clever and keep all of the digits of
     # everything the same width, but that will take a little more effort. For
     # now, we accept that the hours/minutes can cause horizontal shifting.
-    self._secs_w, self._secs_h = draw.textsize(':00', self._res.font_clock_secs)
-    hhmm_w, hhmm_h = draw.textsize('00:00', self._res.font_clock_hhmm)
+    self._secs_w, self._secs_h = self._res.textsize(
+        ':00', self._res.font_clock_secs)
+    hhmm_w, hhmm_h = self._res.textsize('00:00', self._res.font_clock_hhmm)
 
     # Width/height should be 62/14, but it's better to calculate it.
     return hhmm_w + self._secs_w, max(hhmm_h, self._secs_h)
@@ -54,7 +53,7 @@ class TimeWidget(Widget):
     now = datetime.datetime.now().time()
     hhmm = now.strftime('%H:%M')
 
-    hhmm_w, hhmm_h = draw.textsize(hhmm, self._res.font_clock_hhmm)
+    hhmm_w, hhmm_h = self._res.textsize(hhmm, self._res.font_clock_hhmm)
     hhmm_xoffset = (self.width - hhmm_w - self._secs_w) // 2
 
     # Add masking rectangle, so we don't clash with anything underneath.
@@ -84,10 +83,10 @@ class OutOfHoursWidget(Widget):
     self._data = station_data
     self._name = out_of_hours_name
 
-  def _measure_max_size(self, draw):
-    _, welcome_h = draw.textsize(self.WELCOME_TEXT, self._res.font_bold)
+  def _get_max_size(self):
+    _, welcome_h = self._res.textsize(self.WELCOME_TEXT, self._res.font_bold)
     # Use the maximum height of any letter, including ascenders and descenders.
-    _, max_location_h = draw.textsize(
+    _, max_location_h = self._res.textsize(
         '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
         self._res.font_bold)
 
@@ -95,8 +94,9 @@ class OutOfHoursWidget(Widget):
 
   def update(self, draw):
     location = self._name or self._data.station_name
-    welcome_w, welcome_h = draw.textsize(self.WELCOME_TEXT, self._res.font_bold)
-    location_w, location_h = draw.textsize(location, self._res.font_bold)
+    welcome_w, welcome_h = self._res.textsize(
+        self.WELCOME_TEXT, self._res.font_bold)
+    location_w, location_h = self._res.textsize(location, self._res.font_bold)
 
     draw.rectangle(
         [(0, 0), (self.width, self.height)], fill=self._res.background)
