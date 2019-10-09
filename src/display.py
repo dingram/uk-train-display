@@ -246,11 +246,7 @@ class Controller(object):
       view.add_hotspot(self._hotspot_departure(2), (0, 24))
       view.add_hotspot(self._hotspot_departure(3), (0, 36))
 
-    time_widget = widgets.TimeWidget(self._res)
-    view.add_hotspot(
-        time_widget,
-        ((self.device.width - time_widget.width) // 2,
-            self.device.height - time_widget.height))
+    widgets.TimeWidget(self._res).add_to(view, device=self.device)
     view.add_hotspot(
         self._hotspot_data_status(),
         (self.device.width - 12, self.device.height - 12))
@@ -264,15 +260,9 @@ class Controller(object):
     if self._out_of_hours_name not in ('_blank_', '_clock_'):
       ooh_widget = widgets.OutOfHoursWidget(
           self._res, self.data, self._out_of_hours_name)
-      view.add_hotspot(
-          ooh_widget,
-          ((self.device.width - ooh_widget.width) // 2, 0))
+      ooh_widget.add_to(view, device=self.device)
     if self._out_of_hours_name != '_blank_':
-      time_widget = widgets.TimeWidget(self._res)
-      view.add_hotspot(
-          time_widget,
-          ((self.device.width - time_widget.width) // 2,
-              self.device.height - time_widget.height))
+      widgets.TimeWidget(self._res).add_to(view, device=self.device)
 
     return view
 

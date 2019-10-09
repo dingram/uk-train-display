@@ -22,6 +22,13 @@ class Widget(snapshot):
     del im
     return width, height
 
+  def preferred_position(self, host):
+    raise NotImplementedError(
+        'No preferred position for %s' % self.__class__.__name__)
+
+  def add_to(self, viewport, device=None):
+    viewport.add_hotspot(self, self.preferred_position(device or viewport))
+
 
 class TimeWidget(Widget):
   """Widget for rendering the current time."""
@@ -64,6 +71,9 @@ class TimeWidget(Widget):
         font=self._res.font_clock_secs,
         fill=self._res.foreground)
 
+  def preferred_position(self, host):
+    return ((host.width - self.width) // 2, host.height - self.height)
+
 
 class OutOfHoursWidget(Widget):
   """Widget for rendering the "out of hours" text."""
@@ -100,3 +110,6 @@ class OutOfHoursWidget(Widget):
         text=location,
         font=self._res.font_bold,
         fill=self._res.foreground)
+
+  def preferred_position(self, host):
+    return (0, 0)
