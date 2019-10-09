@@ -212,17 +212,13 @@ class Controller(object):
 
     return snapshot(self.device.width, 12, _render, interval=10)
 
-  def _hotspot_calling_at(self, idx):
-    def _render(draw, width, height):
-      pass
-    return snapshot(self.device.width, 12, _render, interval=0.1)
-
   def display_active(self):
     view = viewport(self.device, self.device.width, self.device.height)
 
     view.add_hotspot(self._hotspot_departure(0), (0, 0))
     if self._show_calling_at:
-      view.add_hotspot(self._hotspot_calling_at(0), (0, 12))
+      view.add_hotspot(widgets.CallingAtWidget(
+          self._res, self.data, 0), (0, 12))
       view.add_hotspot(self._hotspot_departure(1), (0, 24))
       view.add_hotspot(self._hotspot_departure(2), (0, 36))
     else:

@@ -115,6 +115,22 @@ class OutOfHoursWidget(Widget):
     return 0, 0
 
 
+class CallingAtWidget(Widget):
+  """Widget for rendering a single "calling at" line."""
+  CALLING_AT_TEXT = 'Calling at:'
+
+  def __init__(self, resources, station_data, departure_index):
+    super().__init__(resources, interval=0.1)
+    self._data = station_data
+    self._index = departure_index
+
+  def _get_max_size(self):
+    return self._res.full_width, self._res.line_height()
+
+  def _update(self, draw):
+    self._res.text(draw, (0, 0), self.CALLING_AT_TEXT)
+
+
 class DataStatusWidget(Widget):
   """Widget for rendering the current train data status."""
 
