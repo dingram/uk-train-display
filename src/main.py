@@ -44,6 +44,8 @@ flags.DEFINE_bool('emulate_api', False,
                   'Whether to emulate the Transport API for local development.')
 flags.DEFINE_bool('emulate_display', False,
                   'Whether to emulate the display for local development.')
+flags.DEFINE_integer('emulated_display_scale', 4,
+                     'Scale factor for emulated display.')
 flags.DEFINE_integer('min_departure_min', 0,
                      'Minimum number of minutes until departure. Trains '
                      'departing sooner than this will not be shown.')
@@ -76,13 +78,15 @@ flags.DEFINE_bool('log_env', False,
                   'Whether to log the current environment variables.')
 
 
-def init_emulated_display():
+def init_emulated_display(scale):
   logging.debug('Using emulated display; ignoring any rotation')
   if not pygame:
     raise app.UsageError(
         'Required luma/pygame dependency not found. Please make sure you '
         'have installed the required libraries and "emu" extras with pip')
-  return pygame(width=display.WIDTH, height=display.HEIGHT)
+  return pygame(
+      width=display.WIDTH, height=display.HEIGHT, scale=scale,
+      transform='identity')
 
 
 def init_physical_display(rotation_deg):
@@ -132,7 +136,7 @@ def main(argv):
           'ENV[%s]: %s', k, v.encode('unicode_escape').decode('latin-1'))
 
   if FLAGS.emulate_display:
-    device = init_emulated_display()
+    device = init_emulated_display(FLAGS.emulated_display_scale)
   else:
     device = init_physical_display(FLAGS.display_rotation)
 
