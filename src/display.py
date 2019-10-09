@@ -14,7 +14,6 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from PIL import ImageOps
 
-import transportapi
 import widgets
 
 
@@ -203,42 +202,6 @@ class Controller(object):
       pass
     return snapshot(self.device.width, 12, _render, interval=0.1)
 
-  def _hotspot_data_status(self):
-    def _render(draw, width, height):
-      state = self.data.state
-      if state == transportapi.DataState.IDLE and self._show_update_countdown:
-        dim = min(width, height)
-        fraction_until_refresh = (
-            self.data.seconds_since_update / self.data.refresh_interval)
-        if fraction_until_refresh < 0.01:
-          draw.ellipse(
-              [(width - dim, height - dim), (width - 1, height - 1)],
-              fill=self._res.foreground)
-        else:
-          draw.pieslice(
-              [(width - dim, height - dim), (width - 1, height - 1)],
-              fill=self._res.foreground,
-              start=(360 * fraction_until_refresh) - 90,
-              end=-90)
-      else:
-        sigil = '?'
-        if state == transportapi.DataState.IDLE:
-          sigil = '.'
-        elif state == transportapi.DataState.LOADING:
-          sigil = self._res.icon_loading
-        elif state == transportapi.DataState.ERROR:
-          sigil = self._res.icon_error
-        elif self.data.is_stale:
-          sigil = 'z'
-        if isinstance(sigil, str):
-          w, h = self._res.textsize(sigil, self._res.font_default)
-          draw.text((width - w, height - h), text=sigil,
-              font=self._res.font_default, fill=self._res.foreground)
-        else:
-          draw.bitmap((0, 0), sigil, fill=self._res.foreground)
-    return snapshot(12, 12, _render, interval=0.1)
-
-
   def display_active(self):
     view = viewport(self.device, self.device.width, self.device.height)
 
@@ -253,9 +216,9 @@ class Controller(object):
       view.add_hotspot(self._hotspot_departure(3), (0, 36))
 
     widgets.TimeWidget(self._res).add_to(view, device=self.device)
-    view.add_hotspot(
-        self._hotspot_data_status(),
-        (self.device.width - 12, self.device.height - 12))
+    data_widget = widgets.DataStatusWidget(
+        self._res, self.data, self._show_update_countdown)
+    data_widget.add_to(view, device=self.device)
     return view
 
   def display_blank(self):

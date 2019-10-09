@@ -7,6 +7,8 @@ from luma.core.virtual import snapshot
 from PIL import Image
 from PIL import ImageDraw
 
+import transportapi
+
 
 class Widget(snapshot, metaclass=abc.ABCMeta):
   """Base widget class."""
@@ -112,4 +114,51 @@ class OutOfHoursWidget(Widget):
         fill=self._res.foreground)
 
   def preferred_position(self, host):
-    return (0, 0)
+    return 0, 0
+
+
+class DataStatusWidget(Widget):
+  """Widget for rendering the current train data status."""
+
+  def __init__(self, resources, station_data, show_update_countdown):
+    super().__init__(resources, interval=0.1)
+    self._data = station_data
+    self._show_update_countdown = show_update_countdown
+
+  def _get_max_size(self):
+    return 12, 12
+
+  def update(self, draw):
+    state = self._data.state
+    if state == transportapi.DataState.IDLE and self._show_update_countdown:
+      fraction_until_refresh = (
+          self._data.seconds_since_update / self._data.refresh_interval)
+      if fraction_until_refresh < 0.01:
+        draw.ellipse(
+            [(0, 0), (self.width - 1, self.height - 1)],
+            fill=self._res.foreground)
+      else:
+        draw.pieslice(
+            [(0, 0), (self.width - 1, self.height - 1)],
+            fill=self._res.foreground,
+            start=(360 * fraction_until_refresh) - 90,
+            end=-90)
+    else:
+      sigil = '?'
+      if state == transportapi.DataState.IDLE:
+        sigil = '.'
+      elif state == transportapi.DataState.LOADING:
+        sigil = self._res.icon_loading
+      elif state == transportapi.DataState.ERROR:
+        sigil = self._res.icon_error
+      elif self._data.is_stale:
+        sigil = 'z'
+      if isinstance(sigil, str):
+        w, h = self._res.textsize(sigil, self._res.font_default)
+        draw.text((width - w, height - h), text=sigil,
+            font=self._res.font_default, fill=self._res.foreground)
+      else:
+        draw.bitmap((0, 0), sigil, fill=self._res.foreground)
+
+  def preferred_position(self, host):
+    return (host.width - self.width, host.height - self.height)
