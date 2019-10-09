@@ -83,6 +83,7 @@ class TimeWidget(Widget):
 class OutOfHoursWidget(Widget):
   """Widget for rendering the "out of hours" text."""
   WELCOME_TEXT = 'Welcome to'
+  LINE_SEP = 2
 
   def __init__(self, resources, station_data, out_of_hours_name):
     super().__init__(resources, interval=60)
@@ -92,11 +93,9 @@ class OutOfHoursWidget(Widget):
   def _get_max_size(self):
     _, welcome_h = self._res.textsize(self.WELCOME_TEXT, self._res.font_bold)
     # Use the maximum height of any letter, including ascenders and descenders.
-    _, max_location_h = self._res.textsize(
-        '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
-        self._res.font_bold)
+    max_location_h = self._res.line_height(self._res.font_bold)
 
-    return self._res.full_width, welcome_h + 2 + max_location_h
+    return self._res.full_width, welcome_h + self.LINE_SEP + max_location_h
 
   def _update(self, draw):
     location = self._name or self._data.station_name
@@ -110,7 +109,7 @@ class OutOfHoursWidget(Widget):
         font=self._res.font_bold,
         fill=self._res.foreground)
     draw.text(
-        ((self.width - location_w) // 2, welcome_h + 2),
+        ((self.width - location_w) // 2, welcome_h + self.LINE_SEP),
         text=location,
         font=self._res.font_bold,
         fill=self._res.foreground)

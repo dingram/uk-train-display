@@ -72,6 +72,13 @@ class Resources(object):
     img = img.convert('1')
     return img
 
+  def line_height(self, font=None):
+    # Use the maximum height of any letter, including ascenders and descenders.
+    _, max_h = self.textsize(
+        '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
+        font or self.font_default)
+    return max_h
+
   def textsize(self, text, font=None):
     """Convenience function to avoid creating images to measure text."""
     return self._draw.textsize(text, font or self.font_default)
