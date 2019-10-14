@@ -71,6 +71,8 @@ flags.DEFINE_string('transport_api_key', None,
 flags.DEFINE_bool('show_calling_at', True,
                   'Whether to show the "calling at" line or an extra '
                   'departure.')
+flags.DEFINE_bool('show_platform', True,
+                  'Whether to show the platform number for departures.')
 flags.DEFINE_bool('show_update_countdown', False,
                   'Whether to show an indicator of how long until the data is '
                   'refreshed.')
@@ -158,6 +160,7 @@ def main(argv):
           default_active=True),
       blank_times=timerange.TimeRanges.parse(FLAGS.blank_times),
       show_calling_at=FLAGS.show_calling_at,
+      show_platform=FLAGS.show_platform,
       show_update_countdown=FLAGS.show_update_countdown,
   )
 

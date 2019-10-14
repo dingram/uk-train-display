@@ -102,12 +102,14 @@ class Resources(object):
 class Controller(object):
 
   def __init__(self, device, station_data, balena_info, out_of_hours_name,
-      active_times, blank_times, show_calling_at, show_update_countdown):
+      active_times, blank_times, show_calling_at, show_platform,
+      show_update_countdown):
     self.device = device
     self.data = station_data
     self.balena = balena_info
     self._out_of_hours_name = out_of_hours_name
     self._show_calling_at = show_calling_at
+    self._show_platform = show_platform
     self._show_update_countdown = show_update_countdown
 
     self._active_times = active_times
@@ -175,22 +177,24 @@ class Controller(object):
 
   def display_active(self):
     view = viewport(self.device, self.device.width, self.device.height)
+    show_platform = self._show_platform
 
-    view.add_hotspot(widgets.DepartureWidget(self._res, self.data, 0), (0, 0))
+    view.add_hotspot(widgets.DepartureWidget(
+        self._res, self.data, 0, show_platform), (0, 0))
     if self._show_calling_at:
       view.add_hotspot(widgets.CallingAtWidget(
           self._res, self.data, 0), (0, 12))
       view.add_hotspot(widgets.DepartureWidget(
-          self._res, self.data, 1), (0, 24))
+          self._res, self.data, 1, show_platform), (0, 24))
       view.add_hotspot(widgets.DepartureWidget(
-          self._res, self.data, 2), (0, 36))
+          self._res, self.data, 2, show_platform), (0, 36))
     else:
       view.add_hotspot(widgets.DepartureWidget(
-          self._res, self.data, 1), (0, 12))
+          self._res, self.data, 1, show_platform), (0, 12))
       view.add_hotspot(widgets.DepartureWidget(
-          self._res, self.data, 2), (0, 24))
+          self._res, self.data, 2, show_platform), (0, 24))
       view.add_hotspot(widgets.DepartureWidget(
-          self._res, self.data, 3), (0, 36))
+          self._res, self.data, 3, show_platform), (0, 36))
 
     widgets.TimeWidget(self._res).add_to(view, device=self.device)
     data_widget = widgets.DataStatusWidget(

@@ -118,10 +118,11 @@ class OutOfHoursWidget(Widget):
 class DepartureWidget(Widget):
   """Widget for rendering a single departure line."""
 
-  def __init__(self, resources, station_data, departure_index):
+  def __init__(self, resources, station_data, departure_index, show_platform):
     self.__font = None
     self._data = station_data
     self._index = departure_index
+    self._show_platform = show_platform
     super().__init__(resources, interval=0.1)
 
   @property
@@ -141,11 +142,51 @@ class DepartureWidget(Widget):
     if self._index >= len(deps):
       return
     dep = deps[self._index]
-    departureTime = dep['aimed_departure_time']
-    dest = dep['destination_name']
-    self._res.text(
-        draw, (0, 0), text=f'{departureTime}  {dest}', font=self._font)
 
+    scheduled_time = dep['aimed_departure_time']
+    destination = dep['destination_name']
+    platform = None
+    if self._show_platform:
+      if dep['mode'] == 'bus':
+        platform = 'BUS'
+      else:
+        platform = dep.get('platform')
+    status = self._get_status(dep)
+
+    scheduled_time_w, _ = self._res.textsize('00:00', self._font)
+    max_destination_w, _ = self._res.textsize(destination, self._font)
+    if platform:
+      platform_w, _ = self._res.textsize(platform, self._font)
+      max_platform_w, _ = self._res.textsize('00', self._res.font_bold)
+      max_platform_w = max(platform_w, max_platform_w)
+    else:
+      platform_w = 0
+      max_platform_w = 0
+    status_w, _ = self._res.textsize(status, self._font)
+    max_status_w, _ = self._res.textsize('CANCELLED', self._font)
+
+    scheduled_time_w += 1
+    status_w += 1
+    max_status_w += 1
+    if platform:
+      max_platform_w += 2
+
+    destination_w = (
+        self.width - scheduled_time_w - max_platform_w - max_status_w)
+
+    # Actually render the line.
+    self._res.text(draw, (0, 0), text=scheduled_time, font=self._font)
+    self._res.text(
+        draw, (scheduled_time_w, 0), text=destination, font=self._font)
+    self._res.text(
+        draw, (self.width - status_w - max_platform_w, 0), text=status,
+        font=self._font, mask=True)
+    if platform:
+      self._res.text(
+          draw, (self.width - platform_w, 0),
+          text=platform, font=self._font, mask=True)
+
+  def _get_status(self, dep):
     status = dep['status']
     if (dep.get('expected_departure_time') and
         dep['expected_departure_time'] != dep['aimed_departure_time']):
@@ -167,11 +208,7 @@ class DepartureWidget(Widget):
     elif status == 'LATE':
       status = 'DELAYED'
 
-    status = f'  {status}'
-    w, _ = self._res.textsize(status, self._font)
-    # Mask the text so the output does not overlap with the station.
-    self._res.text(
-        draw, (self.width - w, 0), text=status, font=self.__font, mask=True)
+    return status
 
 
 class CallingAtWidget(Widget):

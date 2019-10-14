@@ -112,6 +112,9 @@ function prepare_args() {
   # a fourth departure is shown instead.
   optional_boolean_arg show_calling_at showCallingAt true
 
+  # Optional. Whether to show platform numbers for departures.
+  optional_boolean_arg show_platform showPlatform true
+
   # Optional. Whether to show a visual indicator of how long is left until the
   # data is refreshed.
   optional_boolean_arg show_update_countdown showUpdateCountdown false
